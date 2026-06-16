@@ -8,38 +8,83 @@ export type SanitizeResult = {
   removedCount: number;
 };
 
-export function sanitizeJson(input: string): SanitizeResult {
-  let removedCount = 0;
+function isFullyEscapedQuotes(input: string): boolean {
+  let hasQuote = false;
+
+  for (let i = 0; i < input.length; i++) {
+    if (input[i] !== '"') continue;
+    hasQuote = true;
+
+    let backslashes = 0;
+    let j = i - 1;
+    while (j >= 0 && input[j] === "\\") {
+      backslashes++;
+      j--;
+    }
+    if (backslashes % 2 === 0) return false;
+  }
+
+  return hasQuote;
+}
+
+function unescapeQuotes(input: string): SanitizeResult {
   let result = "";
+  let removedCount = 0;
   let i = 0;
 
   while (i < input.length) {
-    if (input[i] === '"') {
-      result += input[i++];
-      while (i < input.length) {
-        if (input[i] === "\\") {
-          result += input[i++];
-          if (i < input.length) result += input[i++];
-        } else if (input[i] === '"') {
-          result += input[i++];
+    if (input[i] === "\\" && input[i + 1] === '"') {
+      result += '"';
+      removedCount++;
+      i += 2;
+      continue;
+    }
+    result += input[i++];
+  }
+
+  return { value: result, removedCount };
+}
+
+export function sanitizeJson(input: string): SanitizeResult {
+  let removedCount = 0;
+  let workingInput = input;
+
+  if (isFullyEscapedQuotes(input)) {
+    const unescaped = unescapeQuotes(input);
+    workingInput = unescaped.value;
+    removedCount += unescaped.removedCount;
+  }
+
+  let result = "";
+  let i = 0;
+
+  while (i < workingInput.length) {
+    if (workingInput[i] === '"') {
+      result += workingInput[i++];
+      while (i < workingInput.length) {
+        if (workingInput[i] === "\\") {
+          result += workingInput[i++];
+          if (i < workingInput.length) result += workingInput[i++];
+        } else if (workingInput[i] === '"') {
+          result += workingInput[i++];
           break;
         } else {
-          result += input[i++];
+          result += workingInput[i++];
         }
       }
       continue;
     }
 
-    if (input[i] === "/" && i + 1 < input.length && input[i + 1] === "/") {
-      while (i < input.length && input[i] !== "\n") i++;
+    if (workingInput[i] === "/" && i + 1 < workingInput.length && workingInput[i + 1] === "/") {
+      while (i < workingInput.length && workingInput[i] !== "\n") i++;
       removedCount++;
       continue;
     }
 
-    if (input[i] === "/" && i + 1 < input.length && input[i + 1] === "*") {
+    if (workingInput[i] === "/" && i + 1 < workingInput.length && workingInput[i + 1] === "*") {
       i += 2;
-      while (i < input.length) {
-        if (input[i] === "*" && i + 1 < input.length && input[i + 1] === "/") {
+      while (i < workingInput.length) {
+        if (workingInput[i] === "*" && i + 1 < workingInput.length && workingInput[i + 1] === "/") {
           i += 2;
           break;
         }
@@ -49,7 +94,7 @@ export function sanitizeJson(input: string): SanitizeResult {
       continue;
     }
 
-    result += input[i++];
+    result += workingInput[i++];
   }
 
   result = result.replace(/,(\s*[}\]])/g, (_, p1) => {
