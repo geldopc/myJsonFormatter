@@ -16,7 +16,7 @@ export function ThemeToggle() {
       size="icon"
       onClick={handleToggle}
       aria-label="Toggle theme"
-      className="relative"
+      className="relative rounded-full"
     >
       <SunIcon
         weight="regular"
