@@ -161,3 +161,23 @@ h6 {
   background-repeat: repeat;
   background-size: 200px;
 }
+
+/* ── JSON syntax highlight — light mode ──────────────── */
+:root {
+  --json-color-key: #1a8300;
+  --json-color-string: #c07000;
+  --json-color-number: #0077cc;
+  --json-color-boolean: #c026a5;
+  --json-color-null: #c026a5;
+  --json-color-punct: #c026a5;
+}
+
+/* ── JSON syntax highlight — dark mode (Dracula) ─────── */
+.dark {
+  --json-color-key: #50fa7b;
+  --json-color-string: #f1fa8c;
+  --json-color-number: #8be9fd;
+  --json-color-boolean: #ff79c6;
+  --json-color-null: #ff79c6;
+  --json-color-punct: #ff79c6;
+}
