@@ -67,8 +67,9 @@ export function Home() {
     } else {
       setInput(result.value);
       setError(null);
-      if (removedCount > 0) {
-        setSanitizedCount(removedCount);
+      const fixCount = removedCount + result.unwrappedCount;
+      if (fixCount > 0) {
+        setSanitizedCount(fixCount);
         setTimeout(() => setSanitizedCount(0), 4000);
       }
       setViewMode(fmt === "pretty" ? "formatted" : "minified");
@@ -254,7 +255,7 @@ export function Home() {
         >
           <BroomIcon weight="duotone" className="shrink-0" size={13} />
           <span className="font-mono leading-relaxed">
-            {sanitizedCount} invalid {sanitizedCount === 1 ? "pattern" : "patterns"} removed
+            {sanitizedCount} fix{sanitizedCount === 1 ? "" : "es"} applied
           </span>
         </div>
       )}
