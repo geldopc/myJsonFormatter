@@ -163,17 +163,19 @@ function unwrapEncodedString(original: string): { value: unknown; unwrappedCount
 export function prettifyJson(input: string): ProcessResult {
   try {
     const parsed = JSON.parse(input);
-    return { value: JSON.stringify(parsed, null, 2), error: null };
+    const { value, unwrappedCount } = deepUnwrapJsonStrings(parsed);
+    return { value: JSON.stringify(value, null, 2), error: null, unwrappedCount };
   } catch (e) {
-    return { value: "", error: (e as Error).message };
+    return { value: "", error: (e as Error).message, unwrappedCount: 0 };
   }
 }
 
 export function minifyJson(input: string): ProcessResult {
   try {
     const parsed = JSON.parse(input);
-    return { value: JSON.stringify(parsed), error: null };
+    const { value, unwrappedCount } = deepUnwrapJsonStrings(parsed);
+    return { value: JSON.stringify(value), error: null, unwrappedCount };
   } catch (e) {
-    return { value: "", error: (e as Error).message };
+    return { value: "", error: (e as Error).message, unwrappedCount: 0 };
   }
 }
