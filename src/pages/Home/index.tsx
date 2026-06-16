@@ -1,6 +1,6 @@
 import * as React from "react";
 import {
-  BracketsIcon,
+  BracketsCurlyIcon,
   BroomIcon,
   CheckIcon,
   CopyIcon,
@@ -288,7 +288,7 @@ export function Home() {
               disabled={!input.trim()}
               className="rounded-full h-8 px-4 text-xs"
             >
-              <BracketsIcon weight="bold" />
+              <BracketsCurlyIcon weight="bold" />
               Prettify
             </Button>
             <Button
