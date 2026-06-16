@@ -16,6 +16,7 @@ import { ThemeToggle } from "@widgets/ThemeToggle";
 import { prettifyJson, minifyJson, sanitizeJson } from "@utils/json";
 import { highlightJson } from "@utils/jsonHighlight";
 import { decodeFromUrl, encodeForUrl } from "@utils/encoding";
+import { isMac } from "@utils/platform";
 
 type ViewMode = "edit" | "formatted" | "minified";
 
@@ -385,7 +386,7 @@ export function Home() {
 
         <div className="w-px h-4 bg-border/70 mx-1" />
         <span className="font-mono text-xs text-muted-foreground/50 px-3 select-none tracking-wider">
-          ⌘↵
+          {isMac() ? "⌘↵" : "Ctrl+↵"}
         </span>
       </div>
     </div>
