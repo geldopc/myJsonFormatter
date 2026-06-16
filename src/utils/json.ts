@@ -10,23 +10,54 @@ export type SanitizeResult = {
 
 export function sanitizeJson(input: string): SanitizeResult {
   let removedCount = 0;
+  let result = "";
+  let i = 0;
 
-  let cleaned = input.replace(/\/\/[^\n]*/g, () => {
-    removedCount++;
-    return "";
-  });
+  while (i < input.length) {
+    if (input[i] === '"') {
+      result += input[i++];
+      while (i < input.length) {
+        if (input[i] === "\\") {
+          result += input[i++];
+          if (i < input.length) result += input[i++];
+        } else if (input[i] === '"') {
+          result += input[i++];
+          break;
+        } else {
+          result += input[i++];
+        }
+      }
+      continue;
+    }
 
-  cleaned = cleaned.replace(/\/\*[\s\S]*?\*\//g, () => {
-    removedCount++;
-    return "";
-  });
+    if (input[i] === "/" && i + 1 < input.length && input[i + 1] === "/") {
+      while (i < input.length && input[i] !== "\n") i++;
+      removedCount++;
+      continue;
+    }
 
-  cleaned = cleaned.replace(/,(\s*[}\]])/g, (_, p1) => {
+    if (input[i] === "/" && i + 1 < input.length && input[i + 1] === "*") {
+      i += 2;
+      while (i < input.length) {
+        if (input[i] === "*" && i + 1 < input.length && input[i + 1] === "/") {
+          i += 2;
+          break;
+        }
+        i++;
+      }
+      removedCount++;
+      continue;
+    }
+
+    result += input[i++];
+  }
+
+  result = result.replace(/,(\s*[}\]])/g, (_, p1) => {
     removedCount++;
     return p1;
   });
 
-  return { value: cleaned, removedCount };
+  return { value: result, removedCount };
 }
 
 export function prettifyJson(input: string): ProcessResult {
