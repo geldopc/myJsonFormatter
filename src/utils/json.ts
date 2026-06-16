@@ -1,6 +1,7 @@
 export type ProcessResult = {
   value: string;
   error: string | null;
+  unwrappedCount: number;
 };
 
 export type SanitizeResult = {
@@ -103,6 +104,60 @@ export function sanitizeJson(input: string): SanitizeResult {
   });
 
   return { value: result, removedCount };
+}
+
+function deepUnwrapJsonStrings(value: unknown): { value: unknown; unwrappedCount: number } {
+  if (Array.isArray(value)) {
+    let unwrappedCount = 0;
+    const mapped = value.map((item) => {
+      const result = deepUnwrapJsonStrings(item);
+      unwrappedCount += result.unwrappedCount;
+      return result.value;
+    });
+    return { value: mapped, unwrappedCount };
+  }
+
+  if (value !== null && typeof value === "object") {
+    let unwrappedCount = 0;
+    const mapped: Record<string, unknown> = {};
+    for (const [key, item] of Object.entries(value)) {
+      const result = deepUnwrapJsonStrings(item);
+      unwrappedCount += result.unwrappedCount;
+      mapped[key] = result.value;
+    }
+    return { value: mapped, unwrappedCount };
+  }
+
+  if (typeof value === "string") {
+    return unwrapEncodedString(value);
+  }
+
+  return { value, unwrappedCount: 0 };
+}
+
+function unwrapEncodedString(original: string): { value: unknown; unwrappedCount: number } {
+  let current: unknown = original;
+  let layers = 0;
+
+  while (typeof current === "string") {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(current);
+    } catch {
+      break;
+    }
+    current = parsed;
+    layers++;
+  }
+
+  const isObjectOrArray =
+    Array.isArray(current) || (current !== null && typeof current === "object");
+  if (layers === 0 || !isObjectOrArray) {
+    return { value: original, unwrappedCount: 0 };
+  }
+
+  const nested = deepUnwrapJsonStrings(current);
+  return { value: nested.value, unwrappedCount: nested.unwrappedCount + layers };
 }
 
 export function prettifyJson(input: string): ProcessResult {
