@@ -19,6 +19,20 @@
     <meta name="twitter:title" content="myJsonFormatter" />
     <meta name="twitter:description" content="A minimal, full-screen JSON formatter. Prettify, minify, and share JSON in-place — no server required." />
     <meta name="twitter:image" content="https://geldopc.github.io/myJsonFormatter/android-chrome-512x512.png" />
+    <script>
+      // Apply theme before first paint to avoid a light flash; default dark.
+      (function () {
+        try {
+          var t = localStorage.getItem("myjsonformatter-theme") || "dark";
+          if (t === "system") {
+            t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          }
+          document.documentElement.classList.add(t);
+        } catch (e) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

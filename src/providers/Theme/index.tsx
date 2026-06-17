@@ -18,7 +18,7 @@ type ThemeProviderProps = {
 export function ThemeProvider({
   children,
   defaultTheme = "dark",
-  storageKey = "portfolio-theme",
+  storageKey = "myjsonformatter-theme",
 }: ThemeProviderProps) {
   const [theme, setThemeState] = React.useState<Theme>(() => {
     try {
