@@ -100,9 +100,10 @@ export function FindReplace({ value, textareaRef, onChange, onClose }: FindRepla
       className="absolute top-14 right-4 z-50 flex flex-col gap-1.5 rounded-xl border border-border bg-background/80 backdrop-blur-xl px-3 py-2.5 shadow-2xl"
       style={{ minWidth: "17rem" }}
     >
-      <div className="flex items-center gap-1.5">
+      <div id="find-row" className="flex items-center gap-1.5">
         <input
           id="find-input"
+          // biome-ignore lint/a11y/noAutofocus: find input must steal focus when panel opens
           autoFocus
           type="text"
           value={findQuery}
@@ -147,7 +148,7 @@ export function FindReplace({ value, textareaRef, onChange, onClose }: FindRepla
         </Button>
       </div>
 
-      <div className="flex items-center gap-1.5">
+      <div id="replace-row" className="flex items-center gap-1.5">
         <input
           id="replace-input"
           type="text"
