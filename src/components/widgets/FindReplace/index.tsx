@@ -1,6 +1,8 @@
 import {
+  closeSearchPanel,
   findNext,
   findPrevious,
+  openSearchPanel,
   replaceAll,
   replaceNext,
   SearchQuery,
@@ -67,6 +69,15 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
     setTotal(count);
     setCurrent(idx);
   }, [view, findText, query]);
+
+  React.useEffect(() => {
+    if (!view) return;
+    openSearchPanel(view);
+    findInputRef.current?.focus();
+    return () => {
+      closeSearchPanel(view);
+    };
+  }, [view]);
 
   React.useEffect(() => {
     if (!view) return;
