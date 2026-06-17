@@ -1,89 +1,111 @@
+import {
+  findNext,
+  findPrevious,
+  replaceAll,
+  replaceNext,
+  SearchQuery,
+  setSearchQuery,
+} from "@codemirror/search";
+import type { EditorView } from "@codemirror/view";
 import { Button } from "@elements/Button";
-import { ArrowDownIcon, ArrowUpIcon, XIcon } from "@phosphor-icons/react";
+import { Tooltip } from "@elements/Tooltip";
+import {
+  ArrowDownIcon,
+  ArrowsClockwiseIcon,
+  ArrowUpIcon,
+  AsteriskIcon,
+  SwapIcon,
+  TextAaIcon,
+  TextTIcon,
+  XIcon,
+} from "@phosphor-icons/react";
 import * as React from "react";
 
 interface FindReplaceProps {
-  value: string;
-  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
-  onChange: (newValue: string) => void;
+  view: EditorView | null;
   onClose: () => void;
 }
 
-function computeMatches(text: string, query: string): number[] {
-  if (!query) return [];
-  const result: number[] = [];
-  const lower = text.toLowerCase();
-  const lowerQuery = query.toLowerCase();
-  let i = 0;
-  while (i < lower.length) {
-    const idx = lower.indexOf(lowerQuery, i);
-    if (idx === -1) break;
-    result.push(idx);
-    i = idx + lowerQuery.length;
-  }
-  return result;
-}
+export function FindReplace({ view, onClose }: FindReplaceProps) {
+  const [findText, setFindText] = React.useState("");
+  const [replaceText, setReplaceText] = React.useState("");
+  const [caseSensitive, setCaseSensitive] = React.useState(false);
+  const [wholeWord, setWholeWord] = React.useState(false);
+  const [regexp, setRegexp] = React.useState(false);
+  const [total, setTotal] = React.useState(0);
+  const [current, setCurrent] = React.useState(0);
+  const [invalid, setInvalid] = React.useState(false);
+  const findInputRef = React.useRef<HTMLInputElement>(null);
+  const searchKeyRef = React.useRef("");
 
-export function FindReplace({ value, textareaRef, onChange, onClose }: FindReplaceProps) {
-  const [findQuery, setFindQuery] = React.useState("");
-  const [replaceQuery, setReplaceQuery] = React.useState("");
-  const [matches, setMatches] = React.useState<number[]>([]);
-  const [currentIndex, setCurrentIndex] = React.useState(0);
-  const nextIndexRef = React.useRef<number | null>(null);
+  const query = React.useMemo(
+    () =>
+      new SearchQuery({
+        search: findText,
+        replace: replaceText,
+        caseSensitive,
+        wholeWord,
+        regexp,
+      }),
+    [findText, replaceText, caseSensitive, wholeWord, regexp]
+  );
 
-  React.useEffect(() => {
-    const newMatches = computeMatches(value, findQuery);
-    setMatches(newMatches);
-    if (nextIndexRef.current !== null) {
-      setCurrentIndex(Math.min(nextIndexRef.current, Math.max(0, newMatches.length - 1)));
-      nextIndexRef.current = null;
-    } else {
-      setCurrentIndex(0);
+  const recount = React.useCallback(() => {
+    if (!view || !findText || !query.valid) {
+      setTotal(0);
+      setCurrent(0);
+      return;
     }
-  }, [findQuery, value]);
+    const cursor = query.getCursor(view.state);
+    const sel = view.state.selection.main;
+    let count = 0;
+    let idx = 0;
+    for (let next = cursor.next(); !next.done; next = cursor.next()) {
+      count++;
+      if (next.value.from === sel.from && next.value.to === sel.to) idx = count;
+    }
+    setTotal(count);
+    setCurrent(idx);
+  }, [view, findText, query]);
 
   React.useEffect(() => {
-    if (matches.length === 0 || !textareaRef.current || !findQuery) return;
-    const start = matches[currentIndex];
-    const end = start + findQuery.length;
-    textareaRef.current.focus();
-    textareaRef.current.setSelectionRange(start, end);
-  }, [matches, currentIndex, findQuery, textareaRef]);
+    if (!view) return;
+    view.dispatch({ effects: setSearchQuery.of(query) });
+    setInvalid(findText.length > 0 && !query.valid);
 
-  function goNext() {
-    if (matches.length === 0) return;
-    setCurrentIndex((i) => (i + 1) % matches.length);
+    const key = JSON.stringify([findText, caseSensitive, wholeWord, regexp]);
+    if (key !== searchKeyRef.current && findText && query.valid) {
+      searchKeyRef.current = key;
+      findNext(view);
+    }
+    recount();
+  }, [view, query, findText, caseSensitive, wholeWord, regexp, recount]);
+
+  function navigate(dir: "next" | "prev") {
+    if (!view || !query.valid) return;
+    if (dir === "next") findNext(view);
+    else findPrevious(view);
+    recount();
+    findInputRef.current?.focus();
   }
 
-  function goPrev() {
-    if (matches.length === 0) return;
-    setCurrentIndex((i) => (i - 1 + matches.length) % matches.length);
-  }
-
-  function handleReplace() {
-    if (matches.length === 0 || !findQuery) return;
-    const start = matches[currentIndex];
-    const newValue = value.slice(0, start) + replaceQuery + value.slice(start + findQuery.length);
-    nextIndexRef.current = currentIndex < matches.length - 1 ? currentIndex : 0;
-    onChange(newValue);
+  function handleReplaceOne() {
+    if (!view || !query.valid) return;
+    replaceNext(view);
+    recount();
+    findInputRef.current?.focus();
   }
 
   function handleReplaceAll() {
-    if (matches.length === 0 || !findQuery) return;
-    let newValue = value;
-    for (let i = matches.length - 1; i >= 0; i--) {
-      const start = matches[i];
-      newValue = newValue.slice(0, start) + replaceQuery + newValue.slice(start + findQuery.length);
-    }
-    onChange(newValue);
-    onClose();
+    if (!view || !query.valid) return;
+    replaceAll(view);
+    recount();
   }
 
   function handleFindKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Enter") {
       e.preventDefault();
-      if (e.shiftKey) goPrev();
-      else goNext();
+      navigate(e.shiftKey ? "prev" : "next");
     }
     if (e.key === "Escape") {
       e.stopPropagation();
@@ -98,100 +120,136 @@ export function FindReplace({ value, textareaRef, onChange, onClose }: FindRepla
     }
   }
 
-  function handleFindChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setFindQuery(e.target.value);
-  }
-
-  function handleReplaceChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setReplaceQuery(e.target.value);
-  }
-
-  const hasMatches = matches.length > 0;
-  const noResults = findQuery.length > 0 && !hasMatches;
+  const hasMatches = total > 0;
+  const counter = findText ? `${current}/${total}` : "";
 
   return (
     <div
       id="find-replace"
-      className="absolute top-14 right-4 z-50 flex flex-col gap-1.5 rounded-xl border border-border bg-background/80 backdrop-blur-xl px-3 py-2.5 shadow-2xl min-w-68"
+      className="absolute top-14 right-4 z-50 flex flex-col gap-1.5 rounded-xl border border-border bg-background/80 px-3 py-2.5 shadow-2xl backdrop-blur-xl min-w-68"
     >
       <div id="find-row" className="flex items-center gap-1.5">
         <input
           id="find-input"
+          ref={findInputRef}
           // biome-ignore lint/a11y/noAutofocus: find input must steal focus when panel opens
           autoFocus
           type="text"
-          value={findQuery}
-          onChange={handleFindChange}
+          value={findText}
+          onChange={(e) => setFindText(e.target.value)}
           onKeyDown={handleFindKeyDown}
           placeholder="buscar..."
           className={`flex-1 bg-transparent font-mono text-xs outline-none placeholder:text-muted-foreground/50 ${
-            noResults ? "text-destructive" : ""
+            invalid ? "text-destructive" : ""
           }`}
         />
-        <span className="font-mono text-xs text-muted-foreground/40 tabular-nums select-none w-10 text-right shrink-0">
-          {findQuery ? `${hasMatches ? currentIndex + 1 : 0}/${matches.length}` : ""}
+        <span className="w-10 shrink-0 select-none text-right font-mono text-xs tabular-nums text-muted-foreground/40">
+          {counter}
         </span>
-        <Button
-          id="find-prev"
-          variant="ghost"
-          size="icon"
-          onClick={goPrev}
-          disabled={!hasMatches}
-          className="h-6 w-6 rounded-md"
-        >
-          <ArrowUpIcon weight="bold" />
-        </Button>
-        <Button
-          id="find-next"
-          variant="ghost"
-          size="icon"
-          onClick={goNext}
-          disabled={!hasMatches}
-          className="h-6 w-6 rounded-md"
-        >
-          <ArrowDownIcon weight="bold" />
-        </Button>
-        <Button
-          id="find-close"
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          className="h-6 w-6 rounded-md"
-        >
-          <XIcon weight="bold" />
-        </Button>
+        <Tooltip label="Diferenciar maiúsculas">
+          <Button
+            id="find-case"
+            variant={caseSensitive ? "muted" : "ghost"}
+            size="icon-sm"
+            onClick={() => setCaseSensitive((v) => !v)}
+            className="rounded-md"
+          >
+            <TextAaIcon weight="bold" />
+          </Button>
+        </Tooltip>
+        <Tooltip label="Palavra inteira">
+          <Button
+            id="find-word"
+            variant={wholeWord ? "muted" : "ghost"}
+            size="icon-sm"
+            onClick={() => setWholeWord((v) => !v)}
+            className="rounded-md"
+          >
+            <TextTIcon weight="bold" />
+          </Button>
+        </Tooltip>
+        <Tooltip label="Expressão regular">
+          <Button
+            id="find-regex"
+            variant={regexp ? "muted" : "ghost"}
+            size="icon-sm"
+            onClick={() => setRegexp((v) => !v)}
+            className="rounded-md"
+          >
+            <AsteriskIcon weight="bold" />
+          </Button>
+        </Tooltip>
+        <Tooltip label="Anterior (⇧⏎)">
+          <Button
+            id="find-prev"
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => navigate("prev")}
+            disabled={!hasMatches}
+            className="rounded-md"
+          >
+            <ArrowUpIcon weight="bold" />
+          </Button>
+        </Tooltip>
+        <Tooltip label="Próximo (⏎)">
+          <Button
+            id="find-next"
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => navigate("next")}
+            disabled={!hasMatches}
+            className="rounded-md"
+          >
+            <ArrowDownIcon weight="bold" />
+          </Button>
+        </Tooltip>
+        <Tooltip label="Fechar (Esc)">
+          <Button
+            id="find-close"
+            variant="ghost"
+            size="icon-sm"
+            onClick={onClose}
+            className="rounded-md"
+          >
+            <XIcon weight="bold" />
+          </Button>
+        </Tooltip>
       </div>
 
       <div id="replace-row" className="flex items-center gap-1.5">
         <input
           id="replace-input"
           type="text"
-          value={replaceQuery}
-          onChange={handleReplaceChange}
+          value={replaceText}
+          onChange={(e) => setReplaceText(e.target.value)}
           onKeyDown={handleReplaceKeyDown}
           placeholder="substituir..."
           className="flex-1 bg-transparent font-mono text-xs outline-none placeholder:text-muted-foreground/50"
         />
-        <Button
-          id="find-replace-one"
-          variant="ghost"
-          size="sm"
-          onClick={handleReplace}
-          disabled={!hasMatches}
-          className="h-6 px-2 text-xs rounded-md"
-        >
-          Rep
-        </Button>
-        <Button
-          id="find-replace-all"
-          variant="ghost"
-          size="sm"
-          onClick={handleReplaceAll}
-          disabled={!hasMatches}
-          className="h-6 px-2 text-xs rounded-md"
-        >
-          Tudo
-        </Button>
+        <Tooltip label="Substituir">
+          <Button
+            id="find-replace-one"
+            variant="ghost"
+            size="icon-sm"
+            onClick={handleReplaceOne}
+            disabled={!hasMatches}
+            className="rounded-md"
+          >
+            <SwapIcon weight="bold" />
+          </Button>
+        </Tooltip>
+        <Tooltip label="Substituir tudo">
+          <Button
+            id="find-replace-all"
+            variant="ghost"
+            size="icon-sm"
+            onClick={handleReplaceAll}
+            disabled={!hasMatches}
+            className="rounded-md"
+          >
+            <ArrowsClockwiseIcon weight="bold" />
+          </Button>
+        </Tooltip>
       </div>
     </div>
   );
