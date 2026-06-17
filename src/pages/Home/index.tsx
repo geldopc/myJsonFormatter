@@ -147,6 +147,10 @@ export function Home() {
     reader.readAsText(file);
   }
 
+  function handleFindClose() {
+    setIsFindOpen(false);
+  }
+
   function syncGutterScroll(scrollTop: number) {
     if (gutterRef.current) gutterRef.current.scrollTop = scrollTop;
   }
@@ -255,7 +259,7 @@ export function Home() {
             value={input}
             textareaRef={textareaRef}
             onChange={setInput}
-            onClose={() => setIsFindOpen(false)}
+            onClose={handleFindClose}
           />
         )}
       </div>
