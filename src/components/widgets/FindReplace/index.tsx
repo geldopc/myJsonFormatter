@@ -4,7 +4,7 @@ import * as React from "react";
 
 interface FindReplaceProps {
   value: string;
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   onChange: (newValue: string) => void;
   onClose: () => void;
 }
