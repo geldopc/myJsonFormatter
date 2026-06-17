@@ -88,6 +88,7 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
     if (key !== searchKeyRef.current && findText && query.valid) {
       searchKeyRef.current = key;
       findNext(view);
+      findInputRef.current?.focus();
     }
     recount();
   }, [view, query, findText, caseSensitive, wholeWord, regexp, recount]);
