@@ -1,4 +1,6 @@
-import * as React from "react";
+import type { EditorView } from "@codemirror/view";
+import { Button } from "@elements/Button";
+import { JsonEditor } from "@modules/JsonEditor";
 import {
   BracketsCurlyIcon,
   BroomIcon,
@@ -7,23 +9,18 @@ import {
   EraserIcon,
   LinkIcon,
   MinusCircleIcon,
-  PencilSimpleIcon,
   UploadSimpleIcon,
   WarningCircleIcon,
 } from "@phosphor-icons/react";
-import { Button } from "@elements/Button";
-import { ThemeToggle } from "@widgets/ThemeToggle";
-import { FindReplace } from "@widgets/FindReplace";
-import { prettifyJson, minifyJson, sanitizeJson } from "@utils/json";
-import { highlightJson } from "@utils/jsonHighlight";
 import { decodeFromUrl, encodeForUrl } from "@utils/encoding";
+import { minifyJson, prettifyJson, sanitizeJson } from "@utils/json";
 import { isMac } from "@utils/platform";
-
-type ViewMode = "edit" | "formatted" | "minified";
+import { FindReplace } from "@widgets/FindReplace";
+import { ThemeToggle } from "@widgets/ThemeToggle";
+import * as React from "react";
 
 export function Home() {
   const [input, setInput] = React.useState("");
-  const [viewMode, setViewMode] = React.useState<ViewMode>("edit");
   const [error, setError] = React.useState<string | null>(null);
   const [copied, setCopied] = React.useState(false);
   const [sharedCopied, setSharedCopied] = React.useState(false);
@@ -32,6 +29,8 @@ export function Home() {
   const [urlLoaded, setUrlLoaded] = React.useState(false);
   const [isFindOpen, setIsFindOpen] = React.useState(false);
 
+  const viewRef = React.useRef<EditorView | null>(null);
+
   React.useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("json");
     if (!param) {
@@ -39,27 +38,10 @@ export function Home() {
       return;
     }
     decodeFromUrl(param)
-      .then((json) => {
-        setInput(json);
-        setViewMode("formatted");
-      })
+      .then((json) => setInput(json))
       .catch(() => {})
       .finally(() => setUrlLoaded(true));
   }, []);
-
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
-  const gutterRef = React.useRef<HTMLDivElement>(null);
-  const preRef = React.useRef<HTMLPreElement>(null);
-
-  const lineCount = React.useMemo(
-    () => Math.max(1, input.split("\n").length),
-    [input]
-  );
-
-  const highlightedJson = React.useMemo(
-    () => (viewMode !== "edit" ? highlightJson(input) : ""),
-    [input, viewMode]
-  );
 
   function process(fmt: "pretty" | "minify") {
     if (!input.trim()) return;
@@ -67,16 +49,14 @@ export function Home() {
     const result = fmt === "pretty" ? prettifyJson(sanitized) : minifyJson(sanitized);
     if (result.error) {
       setError(result.error);
-      setViewMode("edit");
-    } else {
-      setInput(result.value);
-      setError(null);
-      const fixCount = removedCount + result.unwrappedCount;
-      if (fixCount > 0) {
-        setSanitizedCount(fixCount);
-        setTimeout(() => setSanitizedCount(0), 4000);
-      }
-      setViewMode(fmt === "pretty" ? "formatted" : "minified");
+      return;
+    }
+    setInput(result.value);
+    setError(null);
+    const fixCount = removedCount + result.unwrappedCount;
+    if (fixCount > 0) {
+      setSanitizedCount(fixCount);
+      setTimeout(() => setSanitizedCount(0), 4000);
     }
   }
 
@@ -86,17 +66,14 @@ export function Home() {
     }
   }
 
-  function handleBackToEdit() {
-    clearUrlParam();
-    setViewMode("edit");
-    requestAnimationFrame(() => textareaRef.current?.focus());
-  }
-
   function handleClear() {
     clearUrlParam();
     setInput("");
     setError(null);
-    setViewMode("edit");
+  }
+
+  function handleFindClose() {
+    setIsFindOpen(false);
   }
 
   async function handleShare() {
@@ -141,57 +118,37 @@ export function Home() {
       if (typeof text === "string") {
         setInput(text);
         setError(null);
-        setViewMode("edit");
       }
     };
     reader.readAsText(file);
   }
 
-  function handleFindClose() {
-    setIsFindOpen(false);
-  }
-
-  function syncGutterScroll(scrollTop: number) {
-    if (gutterRef.current) gutterRef.current.scrollTop = scrollTop;
-  }
-
+  // biome-ignore lint/correctness/useExhaustiveDependencies: process is stable per render; input is its captured dep
   React.useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
         e.preventDefault();
-        if (viewMode === "edit") process("pretty");
+        process("pretty");
       }
       if ((e.ctrlKey || e.metaKey) && e.key === "f") {
         e.preventDefault();
-        if (isFindOpen) {
-          setIsFindOpen(false);
-          return;
-        }
-        if (viewMode !== "edit") handleBackToEdit();
-        setIsFindOpen(true);
+        setIsFindOpen((v) => !v);
       }
-      if ((e.ctrlKey || e.metaKey) && e.key === "a" && viewMode !== "edit") {
-        e.preventDefault();
-        if (preRef.current) window.getSelection()?.selectAllChildren(preRef.current);
-      }
-      if (e.key === "Escape") {
-        if (isFindOpen) {
-          setIsFindOpen(false);
-          return;
-        }
-        if (viewMode !== "edit") handleBackToEdit();
+      if (e.key === "Escape" && isFindOpen) {
+        setIsFindOpen(false);
       }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [viewMode, input, isFindOpen]);
+  }, [input, isFindOpen]);
 
   if (!urlLoaded) return null;
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: drag-and-drop container needs native drag events
     <div
       id="home"
-      className="flex flex-1 overflow-hidden relative"
+      className="relative flex flex-1 overflow-hidden"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDragEnd={handleDragEnd}
@@ -201,11 +158,11 @@ export function Home() {
         <div
           id="drag-overlay"
           aria-hidden="true"
-          className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-background/85 backdrop-blur-sm border-2 border-dashed border-foreground/20 pointer-events-none"
+          className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-3 border-2 border-foreground/20 border-dashed bg-background/85 backdrop-blur-sm pointer-events-none"
           style={{ animation: "fade-in 0.15s ease forwards" }}
         >
           <UploadSimpleIcon weight="thin" size={48} className="opacity-40" />
-          <span className="font-mono text-xs text-muted-foreground/60 tracking-widest uppercase select-none">
+          <span className="select-none font-mono text-muted-foreground/60 text-xs uppercase tracking-widest">
             Drop JSON file to load
           </span>
         </div>
@@ -215,76 +172,20 @@ export function Home() {
         id="editor-area"
         className="relative flex flex-1 overflow-hidden font-mono text-sm leading-relaxed"
       >
-        <div
-          ref={gutterRef}
-          id="line-gutter"
-          aria-hidden="true"
-          className="shrink-0 select-none text-right text-muted-foreground/25 overflow-hidden pt-8 pb-28 pr-3 pl-4 min-w-12"
-        >
-          {Array.from({ length: lineCount }, (_, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: line numbers are stable positional indices
-            <div key={i + 1} className="leading-relaxed">
-              {i + 1}
-            </div>
-          ))}
-        </div>
-
-        <div className="w-px bg-border/25 shrink-0" />
-
-        {viewMode === "edit" ? (
-          <textarea
-            ref={textareaRef}
-            id="json-input"
-            value={input}
-            onChange={(e) => {
-              setInput(e.target.value);
-              setError(null);
-            }}
-            onScroll={(e) => syncGutterScroll(e.currentTarget.scrollTop)}
-            placeholder={"{\n  \"paste\": \"your JSON here\"\n}"}
-            spellCheck={false}
-            wrap="off"
-            className="flex-1 resize-none bg-transparent outline-none text-foreground dark:text-white dark:subpixel-antialiased placeholder:text-muted-foreground/60 pt-8 pb-28 pl-4 pr-6 overflow-auto"
-          />
-        ) : (
-          <pre
-            ref={preRef}
-            id="json-output"
-            // biome-ignore lint/a11y/noNoninteractiveTabindex: pre acts as a focusable read-only editor pane
-            tabIndex={0}
-            onClick={handleBackToEdit}
-            onScroll={(e) => syncGutterScroll(e.currentTarget.scrollTop)}
-            className="flex-1 overflow-auto pt-8 pb-28 pl-4 pr-6 cursor-text focus:outline-none whitespace-pre"
-            dangerouslySetInnerHTML={{ __html: highlightedJson }}
-          />
-        )}
-        {isFindOpen && (
-          <FindReplace
-            value={input}
-            textareaRef={textareaRef}
-            onChange={setInput}
-            onClose={handleFindClose}
-          />
-        )}
+        <JsonEditor
+          value={input}
+          onChange={setInput}
+          onCreateEditor={(view) => {
+            viewRef.current = view;
+          }}
+        />
+        {isFindOpen && <FindReplace view={viewRef.current} onClose={handleFindClose} />}
       </div>
-
-      {viewMode !== "edit" && (
-        <div
-          id="status-badge"
-          className="fixed top-4 right-6 z-50 flex items-center gap-1.5 select-none pointer-events-none"
-          style={{ animation: "fade-in 0.2s ease forwards" }}
-        >
-          <div className="w-1.5 h-1.5 rounded-full bg-green-500/70" />
-          <span className="font-mono text-xs text-muted-foreground/40 tracking-widest uppercase">
-            {viewMode}
-          </span>
-        </div>
-      )}
 
       {sanitizedCount > 0 && (
         <div
           id="sanitize-toast"
-          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-xl border border-border bg-background/90 backdrop-blur-xl px-4 py-3 text-foreground/60 text-xs max-w-sm shadow-lg"
+          className="-translate-x-1/2 fixed bottom-24 left-1/2 z-50 flex max-w-sm items-center gap-2 rounded-xl border border-border bg-background/90 px-4 py-3 text-foreground/60 text-xs shadow-lg backdrop-blur-xl"
           style={{ animation: "slide-up 0.3s cubic-bezier(0.16,1,0.3,1) both" }}
         >
           <BroomIcon weight="duotone" className="shrink-0" size={13} />
@@ -297,80 +198,54 @@ export function Home() {
       {error && (
         <div
           id="error-toast"
-          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-start gap-2 rounded-xl border border-destructive/25 bg-background/90 backdrop-blur-xl px-4 py-3 text-destructive text-xs max-w-sm shadow-lg"
+          className="-translate-x-1/2 fixed bottom-24 left-1/2 z-50 flex max-w-sm items-start gap-2 rounded-xl border border-destructive/25 bg-background/90 px-4 py-3 text-destructive text-xs shadow-lg backdrop-blur-xl"
           style={{ animation: "slide-up 0.3s cubic-bezier(0.16,1,0.3,1) both" }}
         >
           <WarningCircleIcon weight="fill" className="mt-0.5 shrink-0" size={13} />
-          <span className="font-mono break-all leading-relaxed">{error}</span>
+          <span className="break-all font-mono leading-relaxed">{error}</span>
         </div>
       )}
 
       <div
         id="floating-toolbar"
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-0.5 rounded-full border border-border bg-background/80 backdrop-blur-xl px-1.5 py-1.5 shadow-2xl"
+        className="-translate-x-1/2 fixed bottom-6 left-1/2 z-50 flex items-center gap-0.5 rounded-full border border-border bg-background/80 px-1.5 py-1.5 shadow-2xl backdrop-blur-xl"
         style={{ animation: "slide-up 0.5s cubic-bezier(0.16,1,0.3,1) both" }}
       >
         <ThemeToggle />
 
-        <div className="w-px h-4 bg-border/70 mx-1" />
+        <div className="mx-1 h-4 w-px bg-border/70" />
 
-        {viewMode === "edit" ? (
+        <Button
+          id="btn-pretty"
+          size="sm"
+          onClick={() => process("pretty")}
+          disabled={!input.trim()}
+          className="h-8 rounded-full px-4 text-xs"
+        >
+          <BracketsCurlyIcon weight="bold" />
+          Prettify
+        </Button>
+        <Button
+          id="btn-minify"
+          size="sm"
+          variant="ghost"
+          onClick={() => process("minify")}
+          disabled={!input.trim()}
+          className="h-8 rounded-full px-4 text-xs"
+        >
+          <MinusCircleIcon weight="bold" />
+          Minify
+        </Button>
+
+        {input && (
           <>
-            <Button
-              id="btn-pretty"
-              size="sm"
-              onClick={() => process("pretty")}
-              disabled={!input.trim()}
-              className="rounded-full h-8 px-4 text-xs"
-            >
-              <BracketsCurlyIcon weight="bold" />
-              Prettify
-            </Button>
-            <Button
-              id="btn-minify"
-              size="sm"
-              variant="ghost"
-              onClick={() => process("minify")}
-              disabled={!input.trim()}
-              className="rounded-full h-8 px-4 text-xs"
-            >
-              <MinusCircleIcon weight="bold" />
-              Minify
-            </Button>
-            {input && (
-              <>
-                <div className="w-px h-4 bg-border/70 mx-1" />
-                <Button
-                  id="btn-clear"
-                  size="sm"
-                  variant="ghost"
-                  onClick={handleClear}
-                  className="rounded-full h-8 px-4 text-xs"
-                >
-                  <EraserIcon weight="bold" />
-                  Clear
-                </Button>
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            <Button
-              id="btn-edit"
-              size="sm"
-              variant="ghost"
-              onClick={handleBackToEdit}
-              className="rounded-full h-8 px-4 text-xs"
-            >
-              <PencilSimpleIcon weight="bold" />
-              Edit
-            </Button>
+            <div className="mx-1 h-4 w-px bg-border/70" />
             <Button
               id="btn-copy"
               size="sm"
               variant="ghost"
               onClick={handleCopy}
-              className="rounded-full h-8 px-4 text-xs"
+              className="h-8 rounded-full px-4 text-xs"
             >
               {copied ? (
                 <>
@@ -389,7 +264,7 @@ export function Home() {
               size="sm"
               variant="ghost"
               onClick={handleShare}
-              className="rounded-full h-8 px-4 text-xs"
+              className="h-8 rounded-full px-4 text-xs"
             >
               {sharedCopied ? (
                 <>
@@ -403,13 +278,12 @@ export function Home() {
                 </>
               )}
             </Button>
-            <div className="w-px h-4 bg-border/70 mx-1" />
             <Button
               id="btn-clear"
               size="sm"
               variant="ghost"
               onClick={handleClear}
-              className="rounded-full h-8 px-4 text-xs"
+              className="h-8 rounded-full px-4 text-xs"
             >
               <EraserIcon weight="bold" />
               Clear
@@ -417,8 +291,8 @@ export function Home() {
           </>
         )}
 
-        <div className="w-px h-4 bg-border/70 mx-1" />
-        <span className="font-mono text-xs text-muted-foreground/50 px-3 select-none tracking-wider">
+        <div className="mx-1 h-4 w-px bg-border/70" />
+        <span className="select-none px-3 font-mono text-muted-foreground/50 text-xs tracking-wider">
           {isMac() ? "⌘↵  ·  ⌘F" : "Ctrl+↵  ·  Ctrl+F"}
         </span>
       </div>
