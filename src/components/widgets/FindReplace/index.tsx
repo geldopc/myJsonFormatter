@@ -29,11 +29,17 @@ export function FindReplace({ value, textareaRef, onChange, onClose }: FindRepla
   const [replaceQuery, setReplaceQuery] = React.useState("");
   const [matches, setMatches] = React.useState<number[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(0);
+  const nextIndexRef = React.useRef<number | null>(null);
 
   React.useEffect(() => {
     const newMatches = computeMatches(value, findQuery);
     setMatches(newMatches);
-    setCurrentIndex(0);
+    if (nextIndexRef.current !== null) {
+      setCurrentIndex(Math.min(nextIndexRef.current, Math.max(0, newMatches.length - 1)));
+      nextIndexRef.current = null;
+    } else {
+      setCurrentIndex(0);
+    }
   }, [findQuery, value]);
 
   React.useEffect(() => {
@@ -58,6 +64,7 @@ export function FindReplace({ value, textareaRef, onChange, onClose }: FindRepla
     if (matches.length === 0 || !findQuery) return;
     const start = matches[currentIndex];
     const newValue = value.slice(0, start) + replaceQuery + value.slice(start + findQuery.length);
+    nextIndexRef.current = currentIndex < matches.length - 1 ? currentIndex : 0;
     onChange(newValue);
   }
 
@@ -91,14 +98,21 @@ export function FindReplace({ value, textareaRef, onChange, onClose }: FindRepla
     }
   }
 
+  function handleFindChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setFindQuery(e.target.value);
+  }
+
+  function handleReplaceChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setReplaceQuery(e.target.value);
+  }
+
   const hasMatches = matches.length > 0;
   const noResults = findQuery.length > 0 && !hasMatches;
 
   return (
     <div
       id="find-replace"
-      className="absolute top-14 right-4 z-50 flex flex-col gap-1.5 rounded-xl border border-border bg-background/80 backdrop-blur-xl px-3 py-2.5 shadow-2xl"
-      style={{ minWidth: "17rem" }}
+      className="absolute top-14 right-4 z-50 flex flex-col gap-1.5 rounded-xl border border-border bg-background/80 backdrop-blur-xl px-3 py-2.5 shadow-2xl min-w-68"
     >
       <div id="find-row" className="flex items-center gap-1.5">
         <input
@@ -107,7 +121,7 @@ export function FindReplace({ value, textareaRef, onChange, onClose }: FindRepla
           autoFocus
           type="text"
           value={findQuery}
-          onChange={(e) => setFindQuery(e.target.value)}
+          onChange={handleFindChange}
           onKeyDown={handleFindKeyDown}
           placeholder="buscar..."
           className={`flex-1 bg-transparent font-mono text-xs outline-none placeholder:text-muted-foreground/50 ${
@@ -153,7 +167,7 @@ export function FindReplace({ value, textareaRef, onChange, onClose }: FindRepla
           id="replace-input"
           type="text"
           value={replaceQuery}
-          onChange={(e) => setReplaceQuery(e.target.value)}
+          onChange={handleReplaceChange}
           onKeyDown={handleReplaceKeyDown}
           placeholder="substituir..."
           className="flex-1 bg-transparent font-mono text-xs outline-none placeholder:text-muted-foreground/50"
