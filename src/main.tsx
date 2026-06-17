@@ -1,3 +1,4 @@
+import { Toaster } from "@elements/Toaster";
 import { TooltipProvider } from "@elements/Tooltip";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -14,6 +15,7 @@ createRoot(rootElement).render(
       <TooltipProvider delayDuration={300}>
         <App />
       </TooltipProvider>
+      <Toaster />
     </ThemeProvider>
   </StrictMode>
 );

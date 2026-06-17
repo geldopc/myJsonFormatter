@@ -3,14 +3,12 @@ import { Button } from "@elements/Button";
 import { JsonEditor } from "@modules/JsonEditor";
 import {
   BracketsCurlyIcon,
-  BroomIcon,
   CheckIcon,
   CopyIcon,
   EraserIcon,
   LinkIcon,
   MinusCircleIcon,
   UploadSimpleIcon,
-  WarningCircleIcon,
 } from "@phosphor-icons/react";
 import { decodeFromUrl, encodeForUrl } from "@utils/encoding";
 import { minifyJson, prettifyJson, sanitizeJson } from "@utils/json";
@@ -18,13 +16,12 @@ import { isMac } from "@utils/platform";
 import { FindReplace } from "@widgets/FindReplace";
 import { ThemeToggle } from "@widgets/ThemeToggle";
 import * as React from "react";
+import { toast } from "sonner";
 
 export function Home() {
   const [input, setInput] = React.useState("");
-  const [error, setError] = React.useState<string | null>(null);
   const [copied, setCopied] = React.useState(false);
   const [sharedCopied, setSharedCopied] = React.useState(false);
-  const [sanitizedCount, setSanitizedCount] = React.useState(0);
   const [isDragging, setIsDragging] = React.useState(false);
   const [urlLoaded, setUrlLoaded] = React.useState(false);
   const [isFindOpen, setIsFindOpen] = React.useState(false);
@@ -48,16 +45,15 @@ export function Home() {
     const { value: sanitized, removedCount } = sanitizeJson(input);
     const result = fmt === "pretty" ? prettifyJson(sanitized) : minifyJson(sanitized);
     if (result.error) {
-      setError(result.error);
+      toast.error(result.error);
       return;
     }
     setInput(result.value);
-    setError(null);
     const fixCount = removedCount + result.unwrappedCount;
-    if (fixCount > 0) {
-      setSanitizedCount(fixCount);
-      setTimeout(() => setSanitizedCount(0), 4000);
-    }
+    toast.success(fmt === "pretty" ? "JSON formatado" : "JSON minificado", {
+      description:
+        fixCount > 0 ? `${fixCount} fix${fixCount === 1 ? "" : "es"} applied` : undefined,
+    });
   }
 
   function clearUrlParam() {
@@ -69,16 +65,10 @@ export function Home() {
   function handleClear() {
     clearUrlParam();
     setInput("");
-    setError(null);
   }
 
   function handleFindClose() {
     setIsFindOpen(false);
-  }
-
-  function handleEditorChange(value: string) {
-    setInput(value);
-    if (error) setError(null);
   }
 
   async function handleShare() {
@@ -122,7 +112,6 @@ export function Home() {
       const text = event.target?.result;
       if (typeof text === "string") {
         setInput(text);
-        setError(null);
       }
     };
     reader.readAsText(file);
@@ -179,37 +168,13 @@ export function Home() {
       >
         <JsonEditor
           value={input}
-          onChange={handleEditorChange}
+          onChange={setInput}
           onCreateEditor={(view) => {
             viewRef.current = view;
           }}
         />
         {isFindOpen && <FindReplace view={viewRef.current} onClose={handleFindClose} />}
       </div>
-
-      {sanitizedCount > 0 && (
-        <div
-          id="sanitize-toast"
-          className="-translate-x-1/2 fixed bottom-24 left-1/2 z-50 flex max-w-sm items-center gap-2 rounded-xl border border-border bg-background/90 px-4 py-3 text-foreground/60 text-xs shadow-lg backdrop-blur-xl"
-          style={{ animation: "slide-up 0.3s cubic-bezier(0.16,1,0.3,1) both" }}
-        >
-          <BroomIcon weight="duotone" className="shrink-0" size={13} />
-          <span className="font-mono leading-relaxed">
-            {sanitizedCount} fix{sanitizedCount === 1 ? "" : "es"} applied
-          </span>
-        </div>
-      )}
-
-      {error && (
-        <div
-          id="error-toast"
-          className="-translate-x-1/2 fixed bottom-24 left-1/2 z-50 flex max-w-sm items-start gap-2 rounded-xl border border-destructive/25 bg-background/90 px-4 py-3 text-destructive text-xs shadow-lg backdrop-blur-xl"
-          style={{ animation: "slide-up 0.3s cubic-bezier(0.16,1,0.3,1) both" }}
-        >
-          <WarningCircleIcon weight="fill" className="mt-0.5 shrink-0" size={13} />
-          <span className="break-all font-mono leading-relaxed">{error}</span>
-        </div>
-      )}
 
       <div
         id="floating-toolbar"
@@ -225,10 +190,16 @@ export function Home() {
           size="sm"
           onClick={() => process("pretty")}
           disabled={!input.trim()}
-          className="h-8 rounded-full px-4 text-xs"
+          className="h-8 rounded-full pl-4 pr-2 text-xs"
         >
           <BracketsCurlyIcon weight="bold" />
           Prettify
+          <kbd
+            id="kbd-pretty"
+            className="ml-1 select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1.5 py-0.5 font-mono text-primary-foreground/70 text-xs tracking-tight"
+          >
+            {isMac() ? "⌘↵" : "Ctrl+↵"}
+          </kbd>
         </Button>
         <Button
           id="btn-minify"
@@ -298,7 +269,7 @@ export function Home() {
 
         <div className="mx-1 h-4 w-px bg-border/70" />
         <span className="select-none px-3 font-mono text-muted-foreground/50 text-xs tracking-wider">
-          {isMac() ? "⌘↵  ·  ⌘F" : "Ctrl+↵  ·  Ctrl+F"}
+          {isMac() ? "⌘F" : "Ctrl+F"}
         </span>
       </div>
     </div>

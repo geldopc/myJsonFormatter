@@ -14,6 +14,25 @@ const baseTheme = EditorView.theme({
     fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
     lineHeight: "1.625",
     overflow: "auto",
+    scrollbarWidth: "thin",
+    scrollbarColor: "color-mix(in oklab, var(--foreground) 22%, transparent) transparent",
+  },
+  ".cm-scroller::-webkit-scrollbar": { width: "10px", height: "10px" },
+  ".cm-scroller::-webkit-scrollbar-track": { backgroundColor: "transparent" },
+  ".cm-scroller::-webkit-scrollbar-thumb": {
+    backgroundColor: "color-mix(in oklab, var(--foreground) 22%, transparent)",
+    borderRadius: "9999px",
+    border: "2px solid transparent",
+    backgroundClip: "content-box",
+  },
+  ".cm-scroller::-webkit-scrollbar-thumb:hover": {
+    backgroundColor: "color-mix(in oklab, var(--foreground) 38%, transparent)",
+  },
+  ".cm-scroller::-webkit-scrollbar-corner": { backgroundColor: "transparent" },
+  ".cm-placeholder": {
+    color: "color-mix(in oklab, var(--muted-foreground) 60%, transparent)",
+    whiteSpace: "pre",
+    lineHeight: "1.625",
   },
   ".cm-content": {
     padding: "2rem 1.5rem 7rem 1rem",

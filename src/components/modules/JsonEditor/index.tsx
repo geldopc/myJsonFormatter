@@ -1,8 +1,10 @@
 import { json } from "@codemirror/lang-json";
 import { search } from "@codemirror/search";
-import type { EditorView } from "@codemirror/view";
+import { type EditorView, placeholder } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
 import { editorTheme } from "@/utils/codemirror/theme";
+
+const PLACEHOLDER = '{\n  "paste": "your JSON here"\n}';
 
 interface JsonEditorProps {
   value: string;
@@ -18,7 +20,7 @@ export function JsonEditor({ value, onChange, onCreateEditor }: JsonEditorProps)
         onChange={onChange}
         onCreateEditor={onCreateEditor}
         theme="none"
-        extensions={[json(), search({ top: true }), editorTheme]}
+        extensions={[json(), search({ top: true }), placeholder(PLACEHOLDER), editorTheme]}
         basicSetup={{
           searchKeymap: false,
           highlightSelectionMatches: false,
