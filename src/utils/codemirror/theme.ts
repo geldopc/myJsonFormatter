@@ -27,7 +27,10 @@ const baseTheme = EditorView.theme({
   },
   ".cm-lineNumbers .cm-gutterElement": { padding: "0 0.75rem 0 1rem" },
   ".cm-activeLine": { backgroundColor: "transparent" },
-  ".cm-activeLineGutter": { backgroundColor: "transparent" },
+  ".cm-activeLineGutter": {
+    backgroundColor: "color-mix(in oklab, var(--foreground) 7%, transparent)",
+    color: "var(--foreground)",
+  },
   ".cm-cursor, .cm-dropCursor": { borderLeftColor: "var(--foreground)" },
   ".cm-selectionBackground, &.cm-focused .cm-selectionBackground, .cm-content ::selection": {
     backgroundColor: "color-mix(in oklab, var(--foreground) 15%, transparent)",

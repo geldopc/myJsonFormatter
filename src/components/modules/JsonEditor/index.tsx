@@ -23,7 +23,7 @@ export function JsonEditor({ value, onChange, onCreateEditor }: JsonEditorProps)
           highlightSelectionMatches: false,
           foldGutter: false,
           highlightActiveLine: false,
-          highlightActiveLineGutter: false,
+          highlightActiveLineGutter: true,
           lineNumbers: true,
         }}
         height="100%"
