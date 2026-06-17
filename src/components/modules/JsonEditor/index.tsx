@@ -17,6 +17,7 @@ export function JsonEditor({ value, onChange, onCreateEditor }: JsonEditorProps)
         value={value}
         onChange={onChange}
         onCreateEditor={onCreateEditor}
+        theme="none"
         extensions={[json(), search({ top: true }), editorTheme]}
         basicSetup={{
           searchKeymap: false,
