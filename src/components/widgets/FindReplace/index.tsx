@@ -19,7 +19,7 @@ function computeMatches(text: string, query: string): number[] {
     const idx = lower.indexOf(lowerQuery, i);
     if (idx === -1) break;
     result.push(idx);
-    i = idx + query.length;
+    i = idx + lowerQuery.length;
   }
   return result;
 }

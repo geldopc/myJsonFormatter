@@ -163,6 +163,10 @@ export function Home() {
       }
       if ((e.ctrlKey || e.metaKey) && e.key === "f") {
         e.preventDefault();
+        if (isFindOpen) {
+          setIsFindOpen(false);
+          return;
+        }
         if (viewMode !== "edit") handleBackToEdit();
         setIsFindOpen(true);
       }
@@ -209,7 +213,7 @@ export function Home() {
 
       <div
         id="editor-area"
-        className="flex flex-1 overflow-hidden font-mono text-sm leading-relaxed"
+        className="relative flex flex-1 overflow-hidden font-mono text-sm leading-relaxed"
       >
         <div
           ref={gutterRef}
