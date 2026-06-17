@@ -13,6 +13,7 @@ import {
 } from "@phosphor-icons/react";
 import { Button } from "@elements/Button";
 import { ThemeToggle } from "@widgets/ThemeToggle";
+import { FindReplace } from "@widgets/FindReplace";
 import { prettifyJson, minifyJson, sanitizeJson } from "@utils/json";
 import { highlightJson } from "@utils/jsonHighlight";
 import { decodeFromUrl, encodeForUrl } from "@utils/encoding";
@@ -29,6 +30,7 @@ export function Home() {
   const [sanitizedCount, setSanitizedCount] = React.useState(0);
   const [isDragging, setIsDragging] = React.useState(false);
   const [urlLoaded, setUrlLoaded] = React.useState(false);
+  const [isFindOpen, setIsFindOpen] = React.useState(false);
 
   React.useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("json");
@@ -47,6 +49,7 @@ export function Home() {
 
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const gutterRef = React.useRef<HTMLDivElement>(null);
+  const preRef = React.useRef<HTMLPreElement>(null);
 
   const lineCount = React.useMemo(
     () => Math.max(1, input.split("\n").length),
@@ -154,13 +157,26 @@ export function Home() {
         e.preventDefault();
         if (viewMode === "edit") process("pretty");
       }
-      if (e.key === "Escape" && viewMode !== "edit") {
-        handleBackToEdit();
+      if ((e.ctrlKey || e.metaKey) && e.key === "f") {
+        e.preventDefault();
+        if (viewMode !== "edit") handleBackToEdit();
+        setIsFindOpen(true);
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "a" && viewMode !== "edit") {
+        e.preventDefault();
+        if (preRef.current) window.getSelection()?.selectAllChildren(preRef.current);
+      }
+      if (e.key === "Escape") {
+        if (isFindOpen) {
+          setIsFindOpen(false);
+          return;
+        }
+        if (viewMode !== "edit") handleBackToEdit();
       }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [viewMode, input]);
+  }, [viewMode, input, isFindOpen]);
 
   if (!urlLoaded) return null;
 
@@ -224,6 +240,7 @@ export function Home() {
           />
         ) : (
           <pre
+            ref={preRef}
             id="json-output"
             // biome-ignore lint/a11y/noNoninteractiveTabindex: pre acts as a focusable read-only editor pane
             tabIndex={0}
@@ -231,6 +248,14 @@ export function Home() {
             onScroll={(e) => syncGutterScroll(e.currentTarget.scrollTop)}
             className="flex-1 overflow-auto pt-8 pb-28 pl-4 pr-6 cursor-text focus:outline-none whitespace-pre"
             dangerouslySetInnerHTML={{ __html: highlightedJson }}
+          />
+        )}
+        {isFindOpen && (
+          <FindReplace
+            value={input}
+            textareaRef={textareaRef}
+            onChange={setInput}
+            onClose={() => setIsFindOpen(false)}
           />
         )}
       </div>
@@ -386,7 +411,7 @@ export function Home() {
 
         <div className="w-px h-4 bg-border/70 mx-1" />
         <span className="font-mono text-xs text-muted-foreground/50 px-3 select-none tracking-wider">
-          {isMac() ? "⌘↵" : "Ctrl+↵"}
+          {isMac() ? "⌘↵  ·  ⌘F" : "Ctrl+↵  ·  Ctrl+F"}
         </span>
       </div>
     </div>
