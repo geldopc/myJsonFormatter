@@ -76,6 +76,11 @@ export function Home() {
     setIsFindOpen(false);
   }
 
+  function handleEditorChange(value: string) {
+    setInput(value);
+    if (error) setError(null);
+  }
+
   async function handleShare() {
     const encoded = await encodeForUrl(input);
     const url = `${window.location.origin}${window.location.pathname}?json=${encoded}`;
@@ -174,7 +179,7 @@ export function Home() {
       >
         <JsonEditor
           value={input}
-          onChange={setInput}
+          onChange={handleEditorChange}
           onCreateEditor={(view) => {
             viewRef.current = view;
           }}
