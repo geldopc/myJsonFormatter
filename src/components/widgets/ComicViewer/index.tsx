@@ -1,5 +1,6 @@
 import { Button } from "@elements/Button";
 import { Tooltip } from "@elements/Tooltip";
+import { useFocusTrap } from "@hooks/FocusTrap";
 import { ArrowSquareOutIcon, ShuffleIcon, SpinnerGapIcon, XIcon } from "@phosphor-icons/react";
 import * as React from "react";
 import { comics } from "@/assets/comics";
@@ -18,6 +19,8 @@ export function ComicViewer({ onClose }: ComicViewerProps) {
   const [index, setIndex] = React.useState(() => Math.floor(Math.random() * comics.length));
   const [loading, setLoading] = React.useState(true);
   const comic = comics[index];
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  useFocusTrap(rootRef, true);
 
   const shuffle = React.useCallback(() => {
     setLoading(true);
@@ -41,6 +44,10 @@ export function ComicViewer({ onClose }: ComicViewerProps) {
   return (
     <div
       id="comic-viewer"
+      ref={rootRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Comic viewer"
       className="fixed inset-0 flex items-center justify-center p-6"
       style={{ zIndex: 60, animation: "fade-in 0.2s ease forwards" }}
     >

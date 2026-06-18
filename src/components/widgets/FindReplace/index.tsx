@@ -76,6 +76,7 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
     findInputRef.current?.focus();
     return () => {
       closeSearchPanel(view);
+      view.focus();
     };
   }, [view]);
 
@@ -138,7 +139,9 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
   return (
     <div
       id="find-replace"
-      className="absolute top-14 right-4 z-50 flex flex-col gap-1.5 rounded-xl border border-border bg-background/80 px-3 py-2.5 shadow-2xl backdrop-blur-xl min-w-68"
+      role="dialog"
+      aria-label="Find and replace"
+      className="absolute top-14 right-4 left-4 z-50 flex flex-col gap-1.5 rounded-xl border border-border bg-background/80 px-3 py-2.5 shadow-2xl backdrop-blur-xl min-w-0 sm:left-auto sm:min-w-68"
     >
       <div id="find-row" className="flex items-center gap-1.5">
         <input

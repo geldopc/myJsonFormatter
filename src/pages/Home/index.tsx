@@ -14,12 +14,17 @@ import {
 import { decodeFromUrl, encodeForUrl } from "@utils/encoding";
 import { minifyJson, prettifyJson, sanitizeJson } from "@utils/json";
 import { isMac } from "@utils/platform";
-import { ComicViewer } from "@widgets/ComicViewer";
 import { FindReplace } from "@widgets/FindReplace";
-import { SuccessBurst } from "@widgets/SuccessBurst";
 import { ThemeToggle } from "@widgets/ThemeToggle";
 import * as React from "react";
 import { toast } from "sonner";
+
+const ComicViewer = React.lazy(() =>
+  import("@widgets/ComicViewer").then((m) => ({ default: m.ComicViewer }))
+);
+const SuccessBurst = React.lazy(() =>
+  import("@widgets/SuccessBurst").then((m) => ({ default: m.SuccessBurst }))
+);
 
 export function Home() {
   const [input, setInput] = React.useState("");
@@ -30,6 +35,8 @@ export function Home() {
   const [burst, setBurst] = React.useState(0);
 
   const viewRef = React.useRef<EditorView | null>(null);
+  const inputRef = React.useRef(input);
+  inputRef.current = input;
 
   React.useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("json");
@@ -44,6 +51,7 @@ export function Home() {
   }, []);
 
   function process(fmt: "pretty" | "minify") {
+    const input = inputRef.current;
     if (!input.trim()) return;
     const { value: sanitized, removedCount } = sanitizeJson(input);
     const result = fmt === "pretty" ? prettifyJson(sanitized) : minifyJson(sanitized);
@@ -126,7 +134,7 @@ export function Home() {
     reader.readAsText(file);
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: process is stable per render; input is its captured dep
+  // biome-ignore lint/correctness/useExhaustiveDependencies: process reads input via inputRef; only isFindOpen affects the handler
   React.useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
@@ -143,7 +151,7 @@ export function Home() {
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [input, isFindOpen]);
+  }, [isFindOpen]);
 
   if (!urlLoaded) return null;
 
@@ -183,7 +191,9 @@ export function Home() {
           }}
         />
         {isFindOpen && <FindReplace view={viewRef.current} onClose={handleFindClose} />}
-        <SuccessBurst triggerKey={burst} onDone={() => setBurst(0)} />
+        <React.Suspense fallback={null}>
+          <SuccessBurst triggerKey={burst} onDone={() => setBurst(0)} />
+        </React.Suspense>
       </div>
 
       <div
@@ -211,13 +221,13 @@ export function Home() {
           size="sm"
           onClick={() => process("pretty")}
           disabled={!input.trim()}
-          className="h-8 rounded-full pl-4 pr-2 text-xs"
+          className="h-8 rounded-full px-2 text-xs sm:pl-4 sm:pr-2"
         >
           <BracketsCurlyIcon weight="bold" />
-          Prettify
+          <span className="hidden sm:inline">Prettify</span>
           <kbd
             id="kbd-pretty"
-            className="ml-1 select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1.5 py-0.5 font-mono text-primary-foreground/70 text-xs tracking-tight"
+            className="ml-1 hidden select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1.5 py-0.5 font-mono text-primary-foreground/70 text-xs tracking-tight sm:inline-flex"
           >
             {isMac() ? "⌘↵" : "Ctrl+↵"}
           </kbd>
@@ -228,10 +238,10 @@ export function Home() {
           variant="ghost"
           onClick={() => process("minify")}
           disabled={!input.trim()}
-          className="h-8 rounded-full px-4 text-xs"
+          className="h-8 rounded-full px-2 text-xs sm:px-4"
         >
           <MinusCircleIcon weight="bold" />
-          Minify
+          <span className="hidden sm:inline">Minify</span>
         </Button>
 
         {input && (
@@ -264,21 +274,25 @@ export function Home() {
               size="sm"
               variant="ghost"
               onClick={handleClear}
-              className="h-8 rounded-full px-4 text-xs"
+              className="h-8 rounded-full px-2 text-xs sm:px-4"
             >
               <EraserIcon weight="bold" />
-              Clear
+              <span className="hidden sm:inline">Clear</span>
             </Button>
           </>
         )}
 
-        <div className="mx-1 h-4 w-px bg-border/70" />
-        <span className="select-none px-3 font-mono text-muted-foreground/50 text-xs tracking-wider">
+        <div className="mx-1 hidden h-4 w-px bg-border/70 sm:block" />
+        <span className="hidden select-none px-3 font-mono text-muted-foreground/50 text-xs tracking-wider sm:inline">
           {isMac() ? "⌘F" : "Ctrl+F"}
         </span>
       </div>
 
-      {isComicOpen && <ComicViewer onClose={() => setIsComicOpen(false)} />}
+      {isComicOpen && (
+        <React.Suspense fallback={null}>
+          <ComicViewer onClose={() => setIsComicOpen(false)} />
+        </React.Suspense>
+      )}
     </div>
   );
 }
