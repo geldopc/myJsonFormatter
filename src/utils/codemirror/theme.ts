@@ -35,7 +35,7 @@ const baseTheme = EditorView.theme({
     lineHeight: "1.625",
   },
   ".cm-content": {
-    padding: "2rem 1.5rem 7rem 1rem",
+    padding: "0 1.5rem 7rem 1rem",
     caretColor: "var(--foreground)",
   },
   "&.cm-focused": { outline: "none" },

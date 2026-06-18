@@ -14,6 +14,7 @@ import { decodeFromUrl, encodeForUrl } from "@utils/encoding";
 import { minifyJson, prettifyJson, sanitizeJson } from "@utils/json";
 import { isMac } from "@utils/platform";
 import { FindReplace } from "@widgets/FindReplace";
+import { SuccessBurst } from "@widgets/SuccessBurst";
 import { ThemeToggle } from "@widgets/ThemeToggle";
 import * as React from "react";
 import { toast } from "sonner";
@@ -23,6 +24,7 @@ export function Home() {
   const [isDragging, setIsDragging] = React.useState(false);
   const [urlLoaded, setUrlLoaded] = React.useState(false);
   const [isFindOpen, setIsFindOpen] = React.useState(false);
+  const [burst, setBurst] = React.useState(0);
 
   const viewRef = React.useRef<EditorView | null>(null);
 
@@ -47,6 +49,7 @@ export function Home() {
       return;
     }
     setInput(result.value);
+    setBurst((b) => b + 1);
     const fixCount = removedCount + result.unwrappedCount;
     const fixNote =
       fixCount > 0
@@ -177,6 +180,7 @@ export function Home() {
           }}
         />
         {isFindOpen && <FindReplace view={viewRef.current} onClose={handleFindClose} />}
+        <SuccessBurst triggerKey={burst} onDone={() => setBurst(0)} />
       </div>
 
       <div
