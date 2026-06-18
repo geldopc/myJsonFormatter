@@ -8,11 +8,13 @@ import {
   EraserIcon,
   LinkIcon,
   MinusCircleIcon,
+  SmileyIcon,
   UploadSimpleIcon,
 } from "@phosphor-icons/react";
 import { decodeFromUrl, encodeForUrl } from "@utils/encoding";
 import { minifyJson, prettifyJson, sanitizeJson } from "@utils/json";
 import { isMac } from "@utils/platform";
+import { ComicViewer } from "@widgets/ComicViewer";
 import { FindReplace } from "@widgets/FindReplace";
 import { SuccessBurst } from "@widgets/SuccessBurst";
 import { ThemeToggle } from "@widgets/ThemeToggle";
@@ -24,6 +26,7 @@ export function Home() {
   const [isDragging, setIsDragging] = React.useState(false);
   const [urlLoaded, setUrlLoaded] = React.useState(false);
   const [isFindOpen, setIsFindOpen] = React.useState(false);
+  const [isComicOpen, setIsComicOpen] = React.useState(false);
   const [burst, setBurst] = React.useState(0);
 
   const viewRef = React.useRef<EditorView | null>(null);
@@ -189,6 +192,17 @@ export function Home() {
         style={{ animation: "slide-up 0.5s cubic-bezier(0.16,1,0.3,1) both" }}
       >
         <ThemeToggle />
+        <Tooltip label="Comic break">
+          <Button
+            id="btn-comic"
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsComicOpen(true)}
+            className="rounded-full"
+          >
+            <SmileyIcon weight="bold" />
+          </Button>
+        </Tooltip>
 
         <div className="mx-1 h-4 w-px bg-border/70" />
 
@@ -263,6 +277,8 @@ export function Home() {
           {isMac() ? "⌘F" : "Ctrl+F"}
         </span>
       </div>
+
+      {isComicOpen && <ComicViewer onClose={() => setIsComicOpen(false)} />}
     </div>
   );
 }
