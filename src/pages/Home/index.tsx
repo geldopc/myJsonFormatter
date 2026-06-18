@@ -1,9 +1,9 @@
 import type { EditorView } from "@codemirror/view";
 import { Button } from "@elements/Button";
+import { Tooltip } from "@elements/Tooltip";
 import { JsonEditor } from "@modules/JsonEditor";
 import {
   BracketsCurlyIcon,
-  CheckIcon,
   CopyIcon,
   EraserIcon,
   LinkIcon,
@@ -20,8 +20,6 @@ import { toast } from "sonner";
 
 export function Home() {
   const [input, setInput] = React.useState("");
-  const [copied, setCopied] = React.useState(false);
-  const [sharedCopied, setSharedCopied] = React.useState(false);
   const [isDragging, setIsDragging] = React.useState(false);
   const [urlLoaded, setUrlLoaded] = React.useState(false);
   const [isFindOpen, setIsFindOpen] = React.useState(false);
@@ -45,14 +43,17 @@ export function Home() {
     const { value: sanitized, removedCount } = sanitizeJson(input);
     const result = fmt === "pretty" ? prettifyJson(sanitized) : minifyJson(sanitized);
     if (result.error) {
-      toast.error(result.error);
+      toast.error("That doesn't look like JSON", { description: result.error });
       return;
     }
     setInput(result.value);
     const fixCount = removedCount + result.unwrappedCount;
-    toast.success(fmt === "pretty" ? "JSON formatado" : "JSON minificado", {
-      description:
-        fixCount > 0 ? `${fixCount} fix${fixCount === 1 ? "" : "es"} applied` : undefined,
+    const fixNote =
+      fixCount > 0
+        ? `Tidied up ${fixCount} thing${fixCount === 1 ? "" : "s"} along the way.`
+        : undefined;
+    toast.success(fmt === "pretty" ? "Prettified" : "Minified", {
+      description: fixNote ?? (fmt === "pretty" ? "Looking sharp." : "Every byte counts."),
     });
   }
 
@@ -65,6 +66,7 @@ export function Home() {
   function handleClear() {
     clearUrlParam();
     setInput("");
+    toast("Cleared", { description: "Fresh start." });
   }
 
   function handleFindClose() {
@@ -76,15 +78,15 @@ export function Home() {
     const url = `${window.location.origin}${window.location.pathname}?json=${encoded}`;
     window.history.replaceState(null, "", url);
     await navigator.clipboard.writeText(url);
-    setSharedCopied(true);
-    setTimeout(() => setSharedCopied(false), 2000);
+    toast.success("Share link copied", {
+      description: "Paste it anywhere — the JSON travels with it.",
+    });
   }
 
   async function handleCopy() {
     if (!input) return;
     await navigator.clipboard.writeText(input);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    toast.success("Copied", { description: "The JSON is on your clipboard." });
   }
 
   function handleDragOver(e: React.DragEvent) {
@@ -112,6 +114,7 @@ export function Home() {
       const text = event.target?.result;
       if (typeof text === "string") {
         setInput(text);
+        toast.success("File loaded", { description: file.name });
       }
     };
     reader.readAsText(file);
@@ -216,44 +219,28 @@ export function Home() {
         {input && (
           <>
             <div className="mx-1 h-4 w-px bg-border/70" />
-            <Button
-              id="btn-copy"
-              size="sm"
-              variant="ghost"
-              onClick={handleCopy}
-              className="h-8 rounded-full px-4 text-xs"
-            >
-              {copied ? (
-                <>
-                  <CheckIcon weight="bold" />
-                  Copied
-                </>
-              ) : (
-                <>
-                  <CopyIcon weight="bold" />
-                  Copy
-                </>
-              )}
-            </Button>
-            <Button
-              id="btn-share"
-              size="sm"
-              variant="ghost"
-              onClick={handleShare}
-              className="h-8 rounded-full px-4 text-xs"
-            >
-              {sharedCopied ? (
-                <>
-                  <CheckIcon weight="bold" />
-                  Shared!
-                </>
-              ) : (
-                <>
-                  <LinkIcon weight="bold" />
-                  Share
-                </>
-              )}
-            </Button>
+            <Tooltip label="Copy JSON">
+              <Button
+                id="btn-copy"
+                size="icon"
+                variant="ghost"
+                onClick={handleCopy}
+                className="h-8 w-8 rounded-full"
+              >
+                <CopyIcon weight="bold" />
+              </Button>
+            </Tooltip>
+            <Tooltip label="Copy share link">
+              <Button
+                id="btn-share"
+                size="icon"
+                variant="ghost"
+                onClick={handleShare}
+                className="h-8 w-8 rounded-full"
+              >
+                <LinkIcon weight="bold" />
+              </Button>
+            </Tooltip>
             <Button
               id="btn-clear"
               size="sm"

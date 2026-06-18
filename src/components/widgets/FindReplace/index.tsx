@@ -150,7 +150,7 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
           value={findText}
           onChange={(e) => setFindText(e.target.value)}
           onKeyDown={handleFindKeyDown}
-          placeholder="buscar..."
+          placeholder="find..."
           className={`flex-1 bg-transparent font-mono text-xs outline-none placeholder:text-muted-foreground/50 ${
             invalid ? "text-destructive" : ""
           }`}
@@ -158,7 +158,7 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
         <span className="w-10 shrink-0 select-none text-right font-mono text-xs tabular-nums text-muted-foreground/40">
           {counter}
         </span>
-        <Tooltip label="Diferenciar maiúsculas">
+        <Tooltip label="Match case">
           <Button
             id="find-case"
             variant={caseSensitive ? "muted" : "ghost"}
@@ -169,7 +169,7 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
             <TextAaIcon weight="bold" />
           </Button>
         </Tooltip>
-        <Tooltip label="Palavra inteira">
+        <Tooltip label="Whole word">
           <Button
             id="find-word"
             variant={wholeWord ? "muted" : "ghost"}
@@ -180,7 +180,7 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
             <TextTIcon weight="bold" />
           </Button>
         </Tooltip>
-        <Tooltip label="Expressão regular">
+        <Tooltip label="Regex">
           <Button
             id="find-regex"
             variant={regexp ? "muted" : "ghost"}
@@ -191,7 +191,7 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
             <AsteriskIcon weight="bold" />
           </Button>
         </Tooltip>
-        <Tooltip label="Anterior (⇧⏎)">
+        <Tooltip label="Previous (⇧⏎)">
           <Button
             id="find-prev"
             variant="ghost"
@@ -203,7 +203,7 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
             <ArrowUpIcon weight="bold" />
           </Button>
         </Tooltip>
-        <Tooltip label="Próximo (⏎)">
+        <Tooltip label="Next (⏎)">
           <Button
             id="find-next"
             variant="ghost"
@@ -215,7 +215,7 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
             <ArrowDownIcon weight="bold" />
           </Button>
         </Tooltip>
-        <Tooltip label="Fechar (Esc)">
+        <Tooltip label="Close (Esc)">
           <Button
             id="find-close"
             variant="ghost"
@@ -235,10 +235,10 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
           value={replaceText}
           onChange={(e) => setReplaceText(e.target.value)}
           onKeyDown={handleReplaceKeyDown}
-          placeholder="substituir..."
+          placeholder="replace..."
           className="flex-1 bg-transparent font-mono text-xs outline-none placeholder:text-muted-foreground/50"
         />
-        <Tooltip label="Substituir">
+        <Tooltip label="Replace">
           <Button
             id="find-replace-one"
             variant="ghost"
@@ -250,7 +250,7 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
             <SwapIcon weight="bold" />
           </Button>
         </Tooltip>
-        <Tooltip label="Substituir tudo">
+        <Tooltip label="Replace all">
           <Button
             id="find-replace-all"
             variant="ghost"
