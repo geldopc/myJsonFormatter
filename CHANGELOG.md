@@ -1,5 +1,20 @@
 # Changelog
 
+# [0.2.0](https://github.com/geldopc/myJsonFormatter/compare/v0.1.0...v0.2.0) (2026-06-19)
+
+
+### Bug Fixes
+
+* correct macOS fold shortcut (Cmd-Alt not Cmd-Shift) in InfoModal ([63e5954](https://github.com/geldopc/myJsonFormatter/commit/63e5954a3f1de9c046cbbac9870e9fe4355ad30f))
+* move version below title in InfoModal, rename to My JSON Formatter ([547000b](https://github.com/geldopc/myJsonFormatter/commit/547000b4ae05a21b4645d3075000ee34c2d98011))
+
+
+### Features
+
+* add Fold All / Unfold All buttons to toolbar ([65cd20f](https://github.com/geldopc/myJsonFormatter/commit/65cd20f888c8e825b9f0e507b66d41d5c80783ca))
+* add fold gutter and placeholder styles to editor theme ([98a2aa8](https://github.com/geldopc/myJsonFormatter/commit/98a2aa8afde42adbebaad0ff238a50d8ccdbf2b1))
+* enable JSON folding with Phosphor caret markers ([60a8135](https://github.com/geldopc/myJsonFormatter/commit/60a81352c51291ed273b3c9cf96b23a15b6680c7))
+
 # 0.1.0 (2026-06-19)
 
 
