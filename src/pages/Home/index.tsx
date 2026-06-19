@@ -1,6 +1,7 @@
 import type { EditorView } from "@codemirror/view";
 import { Button } from "@elements/Button";
 import { Tooltip } from "@elements/Tooltip";
+import { useTheme } from "@hooks/Theme";
 import { JsonEditor } from "@modules/JsonEditor";
 import {
   BracketsCurlyIcon,
@@ -39,6 +40,12 @@ export function Home() {
   const [isComicOpen, setIsComicOpen] = React.useState(false);
   const [isInfoOpen, setIsInfoOpen] = React.useState(false);
   const [burst, setBurst] = React.useState(0);
+
+  const { theme } = useTheme();
+  const isDark =
+    theme === "system"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
+      : theme === "dark";
 
   const viewRef = React.useRef<EditorView | null>(null);
   const inputRef = React.useRef(input);
@@ -210,12 +217,13 @@ export function Home() {
         <BorderGlow
           borderRadius={9999}
           backgroundColor="color-mix(in oklch, var(--background) 85%, transparent)"
-          glowColor="0 0 90"
+          glowColor={isDark ? "0 0 90" : "0 0 10"}
           glowRadius={10}
           glowIntensity={0.5}
           coneSpread={10}
           edgeSensitivity={10}
-          colors={["#D4A853", "#B8B8C0", "#B07D5A"]}
+          colors={isDark ? ["#D4A853", "#B8B8C0", "#B07D5A"] : ["#1a1a1a", "#3a3a3a", "#2a2a2a"]}
+          borderColor={isDark ? undefined : "rgb(0 0 0 / 12%)"}
           fillOpacity={0.08}
           className="backdrop-blur-xl"
           animated

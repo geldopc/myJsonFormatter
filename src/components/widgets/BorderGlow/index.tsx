@@ -15,6 +15,7 @@ interface BorderGlowProps {
   animated?: boolean;
   colors?: string[];
   fillOpacity?: number;
+  borderColor?: string;
 }
 
 interface AnimateParams {
@@ -124,6 +125,7 @@ export function BorderGlow({
   animated = false,
   colors = ["#c084fc", "#f472b6", "#38bdf8"],
   fillOpacity = 0.5,
+  borderColor,
 }: BorderGlowProps) {
   const cardRef = React.useRef<HTMLDivElement>(null);
 
@@ -235,6 +237,7 @@ export function BorderGlow({
           "--glow-padding": `${glowRadius}px`,
           "--cone-spread": coneSpread,
           "--fill-opacity": fillOpacity,
+          ...(borderColor ? { "--glow-border-color": borderColor } : {}),
           ...glowVars,
           ...buildGradientVars(colors),
           ...style,
