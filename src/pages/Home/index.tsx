@@ -15,6 +15,7 @@ import {
 import { decodeFromUrl, encodeForUrl } from "@utils/encoding";
 import { minifyJson, prettifyJson, sanitizeJson } from "@utils/json";
 import { isMac } from "@utils/platform";
+import { BorderGlow } from "@widgets/BorderGlow";
 import { FindReplace } from "@widgets/FindReplace";
 import { ThemeToggle } from "@widgets/ThemeToggle";
 import * as React from "react";
@@ -202,148 +203,164 @@ export function Home() {
       </div>
 
       <div
-        id="floating-toolbar"
-        className="-translate-x-1/2 fixed bottom-6 left-1/2 z-50 flex items-center gap-0.5 rounded-full border border-border bg-background/80 px-1.5 py-1.5 shadow-2xl backdrop-blur-xl"
+        id="floating-toolbar-pos"
+        className="-translate-x-1/2 fixed bottom-6 left-1/2 z-50"
         style={{ animation: "slide-up 0.5s cubic-bezier(0.16,1,0.3,1) both" }}
       >
-        <ThemeToggle />
-
-        <Tooltip label="wait, what does this do?">
-          <Button
-            id="btn-info"
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsInfoOpen(true)}
-            className="rounded-full"
-          >
-            <InfoIcon weight="bold" />
-          </Button>
-        </Tooltip>
-
-        <Tooltip label="stall for time">
-          <Button
-            id="btn-comic"
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsComicOpen(true)}
-            className="rounded-full"
-          >
-            <SmileyIcon weight="bold" />
-          </Button>
-        </Tooltip>
-
-        <div className="mx-1 h-4 w-px bg-border/70" />
-
-        <Button
-          id="btn-pretty"
-          size="sm"
-          onClick={() => process("pretty")}
-          disabled={!input.trim()}
-          className="h-8 rounded-full px-2 text-xs sm:pl-4 sm:pr-2"
+        <BorderGlow
+          borderRadius={9999}
+          backgroundColor="color-mix(in oklch, var(--background) 85%, transparent)"
+          glowColor="0 0 90"
+          glowRadius={20}
+          glowIntensity={0.5}
+          coneSpread={20}
+          edgeSensitivity={15}
+          colors={["#f0f0f0", "#d4d4d4", "#e8e8e8"]}
+          fillOpacity={0.08}
+          className="backdrop-blur-xl"
+          animated
         >
-          <BracketsCurlyIcon weight="bold" />
-          <span className="hidden sm:inline">Prettify</span>
-          <span id="kbd-pretty" className="ml-1 hidden items-center gap-0.5 sm:inline-flex">
-            {isMac() ? (
-              <>
-                <kbd className="select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1 py-0.5 font-mono text-primary-foreground/70 text-xs">
-                  ⌘
-                </kbd>
-                <span className="font-mono text-primary-foreground/40 text-xs">+</span>
-                <kbd className="select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1 py-0.5 font-mono text-primary-foreground/70 text-xs">
-                  ↵
-                </kbd>
-              </>
-            ) : (
-              <>
-                <kbd className="select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1 py-0.5 font-mono text-primary-foreground/70 text-xs">
-                  Ctrl
-                </kbd>
-                <span className="font-mono text-primary-foreground/40 text-xs">+</span>
-                <kbd className="select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1 py-0.5 font-mono text-primary-foreground/70 text-xs">
-                  ↵
-                </kbd>
-              </>
-            )}
-          </span>
-        </Button>
+          <div id="floating-toolbar" className="flex items-center gap-0.5 px-1.5 py-1.5">
+            <ThemeToggle />
 
-        <Tooltip label="bye, whitespace">
-          <Button
-            id="btn-minify"
-            size="icon"
-            variant="ghost"
-            onClick={() => process("minify")}
-            disabled={!input.trim()}
-            className="rounded-full"
-          >
-            <MinusCircleIcon weight="bold" />
-          </Button>
-        </Tooltip>
-
-        {input && (
-          <>
-            <div className="mx-1 h-4 w-px bg-border/70" />
-            <Tooltip label="yoink">
+            <Tooltip label="wait, what does this do?">
               <Button
-                id="btn-copy"
-                size="icon"
+                id="btn-info"
                 variant="ghost"
-                onClick={handleCopy}
-                className="h-8 w-8 rounded-full"
-              >
-                <CopyIcon weight="bold" />
-              </Button>
-            </Tooltip>
-            <Tooltip label="spread the JSON">
-              <Button
-                id="btn-share"
                 size="icon"
-                variant="ghost"
-                onClick={handleShare}
-                className="h-8 w-8 rounded-full"
-              >
-                <LinkIcon weight="bold" />
-              </Button>
-            </Tooltip>
-            <Tooltip label="burn it all">
-              <Button
-                id="btn-clear"
-                size="icon"
-                variant="ghost"
-                onClick={handleClear}
+                onClick={() => setIsInfoOpen(true)}
                 className="rounded-full"
               >
-                <EraserIcon weight="bold" />
+                <InfoIcon weight="bold" />
               </Button>
             </Tooltip>
-          </>
-        )}
 
-        <div className="mx-1 hidden h-4 w-px bg-border/70 sm:block" />
-        <span id="kbd-find-hint" className="hidden items-center gap-0.5 px-2 sm:inline-flex">
-          {isMac() ? (
-            <>
-              <kbd className="select-none rounded border border-border bg-muted px-1 py-0.5 font-mono text-muted-foreground text-xs">
-                ⌘
-              </kbd>
-              <span className="font-mono text-muted-foreground/40 text-xs">+</span>
-              <kbd className="select-none rounded border border-border bg-muted px-1 py-0.5 font-mono text-muted-foreground text-xs">
-                F
-              </kbd>
-            </>
-          ) : (
-            <>
-              <kbd className="select-none rounded border border-border bg-muted px-1 py-0.5 font-mono text-muted-foreground text-xs">
-                Ctrl
-              </kbd>
-              <span className="font-mono text-muted-foreground/40 text-xs">+</span>
-              <kbd className="select-none rounded border border-border bg-muted px-1 py-0.5 font-mono text-muted-foreground text-xs">
-                F
-              </kbd>
-            </>
-          )}
-        </span>
+            <Tooltip label="stall for time">
+              <Button
+                id="btn-comic"
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsComicOpen(true)}
+                className="rounded-full"
+              >
+                <SmileyIcon weight="bold" />
+              </Button>
+            </Tooltip>
+
+            <div className="mx-1 h-4 w-px bg-border/70" />
+
+            <Button
+              id="btn-pretty"
+              size="sm"
+              onClick={() => process("pretty")}
+              disabled={!input.trim()}
+              className="h-8 rounded-full px-2 text-xs sm:pl-4 sm:pr-2"
+            >
+              <BracketsCurlyIcon weight="bold" />
+              <span className="hidden sm:inline">Prettify</span>
+              <span id="kbd-pretty" className="ml-1 hidden items-center gap-0.5 sm:inline-flex">
+                {isMac() ? (
+                  <>
+                    <kbd className="select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1 py-0.5 font-mono text-primary-foreground/70 text-xs">
+                      ⌘
+                    </kbd>
+                    <span className="font-mono text-primary-foreground/40 text-xs">+</span>
+                    <kbd className="select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1 py-0.5 font-mono text-primary-foreground/70 text-xs">
+                      ↵
+                    </kbd>
+                  </>
+                ) : (
+                  <>
+                    <kbd className="select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1 py-0.5 font-mono text-primary-foreground/70 text-xs">
+                      Ctrl
+                    </kbd>
+                    <span className="font-mono text-primary-foreground/40 text-xs">+</span>
+                    <kbd className="select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1 py-0.5 font-mono text-primary-foreground/70 text-xs">
+                      ↵
+                    </kbd>
+                  </>
+                )}
+              </span>
+            </Button>
+
+            <Tooltip label="bye, whitespace">
+              <Button
+                id="btn-minify"
+                size="icon"
+                variant="ghost"
+                onClick={() => process("minify")}
+                disabled={!input.trim()}
+                className="rounded-full"
+              >
+                <MinusCircleIcon weight="bold" />
+              </Button>
+            </Tooltip>
+
+            {input && (
+              <>
+                <div className="mx-1 h-4 w-px bg-border/70" />
+                <Tooltip label="yoink">
+                  <Button
+                    id="btn-copy"
+                    size="icon"
+                    variant="ghost"
+                    onClick={handleCopy}
+                    className="h-8 w-8 rounded-full"
+                  >
+                    <CopyIcon weight="bold" />
+                  </Button>
+                </Tooltip>
+                <Tooltip label="spread the JSON">
+                  <Button
+                    id="btn-share"
+                    size="icon"
+                    variant="ghost"
+                    onClick={handleShare}
+                    className="h-8 w-8 rounded-full"
+                  >
+                    <LinkIcon weight="bold" />
+                  </Button>
+                </Tooltip>
+                <Tooltip label="burn it all">
+                  <Button
+                    id="btn-clear"
+                    size="icon"
+                    variant="ghost"
+                    onClick={handleClear}
+                    className="rounded-full"
+                  >
+                    <EraserIcon weight="bold" />
+                  </Button>
+                </Tooltip>
+              </>
+            )}
+
+            <div className="mx-1 hidden h-4 w-px bg-border/70 sm:block" />
+            <span id="kbd-find-hint" className="hidden items-center gap-0.5 px-2 sm:inline-flex">
+              {isMac() ? (
+                <>
+                  <kbd className="select-none rounded border border-border bg-muted px-1 py-0.5 font-mono text-muted-foreground text-xs">
+                    ⌘
+                  </kbd>
+                  <span className="font-mono text-muted-foreground/40 text-xs">+</span>
+                  <kbd className="select-none rounded border border-border bg-muted px-1 py-0.5 font-mono text-muted-foreground text-xs">
+                    F
+                  </kbd>
+                </>
+              ) : (
+                <>
+                  <kbd className="select-none rounded border border-border bg-muted px-1 py-0.5 font-mono text-muted-foreground text-xs">
+                    Ctrl
+                  </kbd>
+                  <span className="font-mono text-muted-foreground/40 text-xs">+</span>
+                  <kbd className="select-none rounded border border-border bg-muted px-1 py-0.5 font-mono text-muted-foreground text-xs">
+                    F
+                  </kbd>
+                </>
+              )}
+            </span>
+          </div>
+        </BorderGlow>
       </div>
 
       {isComicOpen && (
