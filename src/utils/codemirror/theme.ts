@@ -62,6 +62,28 @@ const baseTheme = EditorView.theme({
     backgroundColor: "color-mix(in oklab, var(--foreground) 30%, transparent)",
   },
   ".cm-panels": { display: "none" },
+  ".cm-foldGutter .cm-gutterElement": {
+    padding: "0 0.25rem",
+    cursor: "pointer",
+    color: "color-mix(in oklab, var(--muted-foreground) 40%, transparent)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ".cm-foldGutter .cm-gutterElement:hover": {
+    color: "var(--foreground)",
+  },
+  ".cm-foldPlaceholder": {
+    backgroundColor: "transparent",
+    border: "none",
+    color: "color-mix(in oklab, var(--muted-foreground) 40%, transparent)",
+    fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+    cursor: "pointer",
+    padding: "0 0.25rem",
+  },
+  ".cm-foldPlaceholder:hover": {
+    color: "var(--foreground)",
+  },
 });
 
 const highlightStyle = HighlightStyle.define([
