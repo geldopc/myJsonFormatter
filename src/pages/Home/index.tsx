@@ -217,12 +217,12 @@ export function Home() {
         <BorderGlow
           borderRadius={9999}
           backgroundColor="color-mix(in oklch, var(--background) 85%, transparent)"
-          glowColor={isDark ? "0 0 90" : "0 0 10"}
+          glowColor={isDark ? "0 0 90" : "38 65 28"}
           glowRadius={10}
           glowIntensity={0.5}
           coneSpread={10}
           edgeSensitivity={10}
-          colors={isDark ? ["#D4A853", "#B8B8C0", "#B07D5A"] : ["#1a1a1a", "#3a3a3a", "#2a2a2a"]}
+          colors={isDark ? ["#D4A853", "#B8B8C0", "#B07D5A"] : ["#1a1a1a", "#8B6914", "#7A4522"]}
           borderColor={isDark ? undefined : "rgb(0 0 0 / 12%)"}
           fillOpacity={0.08}
           className="backdrop-blur-xl"
