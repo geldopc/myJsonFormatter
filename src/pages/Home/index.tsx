@@ -1,9 +1,12 @@
+import { foldAll, unfoldAll } from "@codemirror/language";
 import type { EditorView } from "@codemirror/view";
 import { Button } from "@elements/Button";
 import { Tooltip } from "@elements/Tooltip";
 import { useTheme } from "@hooks/Theme";
 import { JsonEditor } from "@modules/JsonEditor";
 import {
+  ArrowsInSimpleIcon,
+  ArrowsOutSimpleIcon,
   BracketsCurlyIcon,
   CopyIcon,
   EraserIcon,
@@ -145,6 +148,16 @@ export function Home() {
       }
     };
     reader.readAsText(file);
+  }
+
+  function handleFoldAll() {
+    if (!viewRef.current) return;
+    foldAll(viewRef.current);
+  }
+
+  function handleUnfoldAll() {
+    if (!viewRef.current) return;
+    unfoldAll(viewRef.current);
   }
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: process reads input via inputRef; only isFindOpen affects the handler
@@ -301,6 +314,34 @@ export function Home() {
                 className="rounded-full"
               >
                 <MinusCircleIcon weight="bold" />
+              </Button>
+            </Tooltip>
+
+            <div className="mx-1 bg-border/70 w-px h-4" />
+
+            <Tooltip label="fold all">
+              <Button
+                id="btn-fold-all"
+                size="icon"
+                variant="ghost"
+                onClick={handleFoldAll}
+                disabled={!input.trim()}
+                className="rounded-full"
+              >
+                <ArrowsInSimpleIcon weight="bold" />
+              </Button>
+            </Tooltip>
+
+            <Tooltip label="unfold all">
+              <Button
+                id="btn-unfold-all"
+                size="icon"
+                variant="ghost"
+                onClick={handleUnfoldAll}
+                disabled={!input.trim()}
+                className="rounded-full"
+              >
+                <ArrowsOutSimpleIcon weight="bold" />
               </Button>
             </Tooltip>
 
