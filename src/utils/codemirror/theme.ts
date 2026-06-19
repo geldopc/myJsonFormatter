@@ -40,7 +40,7 @@ const baseTheme = EditorView.theme({
   },
   "&.cm-focused": { outline: "none" },
   ".cm-gutters": {
-    backgroundColor: "transparent",
+    backgroundColor: "var(--background)",
     border: "none",
     color: "color-mix(in oklab, var(--muted-foreground) 40%, transparent)",
   },
