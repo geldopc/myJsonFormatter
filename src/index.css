@@ -150,15 +150,52 @@ h6 {
 }
 
 @keyframes burst-particle {
-  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
-  100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes theme-icon {
+  0% {
+    transform: scale(0) rotate(-20deg);
+    opacity: 0;
+  }
+  30% {
+    transform: scale(1.25) rotate(8deg);
+    opacity: 1;
+  }
+  65% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(0.2) rotate(15deg);
+    opacity: 0;
+  }
 }
 
 @keyframes burst-icon {
-  0%   { transform: scale(0); opacity: 0; }
-  30%  { transform: scale(1.4); opacity: 0.85; }
-  65%  { transform: scale(0.95); opacity: 0.7; }
-  100% { transform: scale(0); opacity: 0; }
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  30% {
+    transform: scale(1.4);
+    opacity: 0.85;
+  }
+  65% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
 }
 
 /* ── Grain overlay ─────────────────────────────────── */

@@ -1,19 +1,18 @@
 import { foldAll, unfoldAll } from "@codemirror/language";
-import type { EditorView } from "@codemirror/view";
+import { EditorView } from "@codemirror/view";
 import { Button } from "@elements/Button";
 import { Tooltip } from "@elements/Tooltip";
 import { useTheme } from "@hooks/Theme";
 import { JsonEditor } from "@modules/JsonEditor";
+import { SideToolbar } from "@modules/SideToolbar";
 import {
   ArrowsInSimpleIcon,
   ArrowsOutSimpleIcon,
   BracketsCurlyIcon,
   CopyIcon,
   EraserIcon,
-  InfoIcon,
   LinkIcon,
   MinusCircleIcon,
-  SmileyIcon,
   UploadSimpleIcon,
 } from "@phosphor-icons/react";
 import { decodeFromUrl, encodeForUrl } from "@utils/encoding";
@@ -21,7 +20,6 @@ import { minifyJson, prettifyJson, sanitizeJson } from "@utils/json";
 import { isMac } from "@utils/platform";
 import { BorderGlow } from "@widgets/BorderGlow";
 import { FindReplace } from "@widgets/FindReplace";
-import { ThemeToggle } from "@widgets/ThemeToggle";
 import * as React from "react";
 import { toast } from "sonner";
 
@@ -34,6 +32,9 @@ const InfoModal = React.lazy(() =>
 const SuccessBurst = React.lazy(() =>
   import("@widgets/SuccessBurst").then((m) => ({ default: m.SuccessBurst }))
 );
+const ThemeOverlay = React.lazy(() =>
+  import("@widgets/ThemeOverlay").then((m) => ({ default: m.ThemeOverlay }))
+);
 
 export function Home() {
   const [input, setInput] = React.useState("");
@@ -43,6 +44,10 @@ export function Home() {
   const [isComicOpen, setIsComicOpen] = React.useState(false);
   const [isInfoOpen, setIsInfoOpen] = React.useState(false);
   const [burst, setBurst] = React.useState(0);
+  const [themeAnim, setThemeAnim] = React.useState<{ key: number; variant: "sun" | "moon" }>({
+    key: 0,
+    variant: "sun",
+  });
 
   const { theme } = useTheme();
   const isDark =
@@ -51,8 +56,18 @@ export function Home() {
       : theme === "dark";
 
   const viewRef = React.useRef<EditorView | null>(null);
+  const prevThemeRef = React.useRef(theme);
   const inputRef = React.useRef(input);
   inputRef.current = input;
+
+  React.useEffect(() => {
+    if (prevThemeRef.current === theme) return;
+    const goingDark =
+      theme === "dark" ||
+      (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    setThemeAnim((prev) => ({ key: prev.key + 1, variant: goingDark ? "moon" : "sun" }));
+    prevThemeRef.current = theme;
+  }, [theme]);
 
   React.useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("json");
@@ -76,6 +91,12 @@ export function Home() {
       return;
     }
     setInput(result.value);
+    requestAnimationFrame(() => {
+      viewRef.current?.dispatch({
+        selection: { anchor: 0 },
+        effects: EditorView.scrollIntoView(0, { y: "start" }),
+      });
+    });
     setBurst((b) => b + 1);
     const fixCount = removedCount + result.unwrappedCount;
     const fixNote =
@@ -242,34 +263,6 @@ export function Home() {
           animated
         >
           <div id="floating-toolbar" className="flex items-center gap-0.5 px-1.5 py-1.5">
-            <ThemeToggle />
-
-            <Tooltip label="wait, what does this do?">
-              <Button
-                id="btn-info"
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsInfoOpen(true)}
-                className="rounded-full"
-              >
-                <InfoIcon weight="bold" />
-              </Button>
-            </Tooltip>
-
-            <Tooltip label="stall for time">
-              <Button
-                id="btn-comic"
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsComicOpen(true)}
-                className="rounded-full"
-              >
-                <SmileyIcon weight="bold" />
-              </Button>
-            </Tooltip>
-
-            <div className="mx-1 bg-border/70 w-px h-4" />
-
             <Button
               id="btn-pretty"
               size="sm"
@@ -411,6 +404,19 @@ export function Home() {
           </div>
         </BorderGlow>
       </div>
+
+      <SideToolbar
+        onInfoOpen={() => setIsInfoOpen(true)}
+        onComicOpen={() => setIsComicOpen(true)}
+      />
+
+      <React.Suspense fallback={null}>
+        <ThemeOverlay
+          triggerKey={themeAnim.key}
+          variant={themeAnim.variant}
+          onDone={() => setThemeAnim({ key: 0, variant: "sun" })}
+        />
+      </React.Suspense>
 
       {isComicOpen && (
         <React.Suspense fallback={null}>
