@@ -141,8 +141,9 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
       id="find-replace"
       role="dialog"
       aria-label="Find and replace"
-      className="absolute top-2 right-2 left-2 z-50 flex flex-col gap-1.5 rounded-xl border border-border bg-background/80 px-3 py-2.5 shadow-2xl backdrop-blur-xl sm:left-auto sm:w-80"
+      className="absolute top-2 right-2 left-2 z-50 flex flex-col gap-2 rounded-xl border border-border bg-background/90 px-3 py-2.5 shadow-2xl backdrop-blur-xl sm:left-auto sm:min-w-96"
     >
+      {/* Find row: input → toggles → counter → nav → close  (VSCode-style) */}
       <div id="find-row" className="flex items-center gap-1.5">
         <input
           id="find-input"
@@ -154,13 +155,56 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
           onChange={(e) => setFindText(e.target.value)}
           onKeyDown={handleFindKeyDown}
           placeholder="find..."
-          className={`flex-1 min-w-0 bg-transparent font-mono text-xs outline-none placeholder:text-muted-foreground/50 ${
+          className={`min-w-0 flex-1 bg-transparent font-mono text-xs outline-none placeholder:text-muted-foreground/50 ${
             invalid ? "text-destructive" : ""
           }`}
         />
-        <span className="w-10 shrink-0 select-none text-right font-mono text-xs tabular-nums text-muted-foreground/40">
+
+        <div id="find-toggles" className="flex shrink-0 items-center gap-0.5">
+          <Tooltip label="Match case">
+            <Button
+              id="find-case"
+              variant={caseSensitive ? "muted" : "ghost"}
+              size="icon-sm"
+              onClick={() => setCaseSensitive((v) => !v)}
+              className="rounded-md"
+            >
+              <TextAaIcon weight="bold" />
+            </Button>
+          </Tooltip>
+          <Tooltip label="Whole word">
+            <Button
+              id="find-word"
+              variant={wholeWord ? "muted" : "ghost"}
+              size="icon-sm"
+              onClick={() => setWholeWord((v) => !v)}
+              className="rounded-md"
+            >
+              <TextTIcon weight="bold" />
+            </Button>
+          </Tooltip>
+          <Tooltip label="Regex">
+            <Button
+              id="find-regex"
+              variant={regexp ? "muted" : "ghost"}
+              size="icon-sm"
+              onClick={() => setRegexp((v) => !v)}
+              className="rounded-md"
+            >
+              <AsteriskIcon weight="bold" />
+            </Button>
+          </Tooltip>
+        </div>
+
+        <div className="h-3.5 w-px shrink-0 bg-border/50" />
+
+        <span
+          id="find-counter"
+          className="w-8 shrink-0 select-none text-right font-mono text-xs tabular-nums text-muted-foreground/40"
+        >
           {counter}
         </span>
+
         <Tooltip label="Previous (⇧⏎)">
           <Button
             id="find-prev"
@@ -198,43 +242,8 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
         </Tooltip>
       </div>
 
+      {/* Replace row: input → replace-one → replace-all */}
       <div id="replace-row" className="flex items-center gap-1.5">
-        <Tooltip label="Match case">
-          <Button
-            id="find-case"
-            variant={caseSensitive ? "muted" : "ghost"}
-            size="icon-sm"
-            onClick={() => setCaseSensitive((v) => !v)}
-            className="rounded-md"
-          >
-            <TextAaIcon weight="bold" />
-          </Button>
-        </Tooltip>
-        <Tooltip label="Whole word">
-          <Button
-            id="find-word"
-            variant={wholeWord ? "muted" : "ghost"}
-            size="icon-sm"
-            onClick={() => setWholeWord((v) => !v)}
-            className="rounded-md"
-          >
-            <TextTIcon weight="bold" />
-          </Button>
-        </Tooltip>
-        <Tooltip label="Regex">
-          <Button
-            id="find-regex"
-            variant={regexp ? "muted" : "ghost"}
-            size="icon-sm"
-            onClick={() => setRegexp((v) => !v)}
-            className="rounded-md"
-          >
-            <AsteriskIcon weight="bold" />
-          </Button>
-        </Tooltip>
-
-        <div id="find-options-divider" className="h-4 w-px shrink-0 bg-border/50" />
-
         <input
           id="replace-input"
           type="text"
