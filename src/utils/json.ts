@@ -34,13 +34,22 @@ function unescapeQuotes(input: string): SanitizeResult {
   let i = 0;
 
   while (i < input.length) {
-    if (input[i] === "\\" && input[i + 1] === '"') {
-      result += '"';
-      removedCount++;
-      i += 2;
-      continue;
+    if (input[i] === "\\") {
+      const next = input[i + 1];
+      if (next === '"') {
+        result += '"';
+        removedCount++;
+        i += 2;
+      } else if (next === "\\") {
+        result += "\\";
+        removedCount++;
+        i += 2;
+      } else {
+        result += input[i++];
+      }
+    } else {
+      result += input[i++];
     }
-    result += input[i++];
   }
 
   return { value: result, removedCount };
