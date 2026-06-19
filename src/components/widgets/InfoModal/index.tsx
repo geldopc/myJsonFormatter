@@ -63,9 +63,7 @@ export function InfoModal({ onClose }: InfoModalProps) {
           >
             My JSON Formatter
           </h2>
-          <span className="font-mono text-xs text-muted-foreground/40">
-            v{__APP_VERSION__}
-          </span>
+          <span className="font-mono text-xs text-muted-foreground/40">v{__APP_VERSION__}</span>
         </div>
 
         <section id="info-features" className="mb-5">
@@ -91,6 +89,8 @@ export function InfoModal({ onClose }: InfoModalProps) {
             <ShortcutRow keys={["↵"]} label="Next match (in find panel)" />
             <ShortcutRow keys={["⇧", "↵"]} label="Previous match" />
             <ShortcutRow keys={["Esc"]} label="Close find panel" />
+            <ShortcutRow keys={[mod, "⇧", "["]} label="Fold block" />
+            <ShortcutRow keys={[mod, "⇧", "]"]} label="Unfold block" />
           </div>
         </section>
       </div>
