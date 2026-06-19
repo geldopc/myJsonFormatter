@@ -141,7 +141,7 @@ export function FindReplace({ view, onClose }: FindReplaceProps) {
       id="find-replace"
       role="dialog"
       aria-label="Find and replace"
-      className="absolute top-14 right-4 left-4 z-50 flex flex-col gap-1.5 rounded-xl border border-border bg-background/80 px-3 py-2.5 shadow-2xl backdrop-blur-xl min-w-0 sm:left-auto sm:min-w-68"
+      className="absolute top-2 right-2 z-50 flex flex-col gap-1.5 rounded-xl border border-border bg-background/80 px-3 py-2.5 shadow-2xl backdrop-blur-xl w-72 max-w-full"
     >
       <div id="find-row" className="flex items-center gap-1.5">
         <input
