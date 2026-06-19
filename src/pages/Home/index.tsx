@@ -175,11 +175,11 @@ export function Home() {
         <div
           id="drag-overlay"
           aria-hidden="true"
-          className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-3 border-2 border-foreground/20 border-dashed bg-background/85 backdrop-blur-sm pointer-events-none"
+          className="z-40 absolute inset-0 flex flex-col justify-center items-center gap-3 bg-background/85 backdrop-blur-sm border-2 border-foreground/20 border-dashed pointer-events-none"
           style={{ animation: "fade-in 0.15s ease forwards" }}
         >
           <UploadSimpleIcon weight="thin" size={48} className="opacity-40" />
-          <span className="select-none font-mono text-muted-foreground/60 text-xs uppercase tracking-widest">
+          <span className="font-mono text-muted-foreground/60 text-xs uppercase tracking-widest select-none">
             Drop JSON file to load
           </span>
         </div>
@@ -204,18 +204,18 @@ export function Home() {
 
       <div
         id="floating-toolbar-pos"
-        className="-translate-x-1/2 fixed bottom-6 left-1/2 z-50"
+        className="bottom-6 left-1/2 z-50 fixed -translate-x-1/2"
         style={{ animation: "slide-up 0.5s cubic-bezier(0.16,1,0.3,1) both" }}
       >
         <BorderGlow
           borderRadius={9999}
           backgroundColor="color-mix(in oklch, var(--background) 85%, transparent)"
           glowColor="0 0 90"
-          glowRadius={20}
+          glowRadius={10}
           glowIntensity={0.5}
-          coneSpread={20}
-          edgeSensitivity={15}
-          colors={["#f0f0f0", "#d4d4d4", "#e8e8e8"]}
+          coneSpread={10}
+          edgeSensitivity={10}
+          colors={["#D4A853", "#B8B8C0", "#B07D5A"]}
           fillOpacity={0.08}
           className="backdrop-blur-xl"
           animated
@@ -247,35 +247,35 @@ export function Home() {
               </Button>
             </Tooltip>
 
-            <div className="mx-1 h-4 w-px bg-border/70" />
+            <div className="mx-1 bg-border/70 w-px h-4" />
 
             <Button
               id="btn-pretty"
               size="sm"
               onClick={() => process("pretty")}
               disabled={!input.trim()}
-              className="h-8 rounded-full px-2 text-xs sm:pl-4 sm:pr-2"
+              className="px-2 sm:pr-2 sm:pl-4 rounded-full h-8 text-xs"
             >
               <BracketsCurlyIcon weight="bold" />
               <span className="hidden sm:inline">Prettify</span>
-              <span id="kbd-pretty" className="ml-1 hidden items-center gap-0.5 sm:inline-flex">
+              <span id="kbd-pretty" className="hidden sm:inline-flex items-center gap-0.5 ml-1">
                 {isMac() ? (
                   <>
-                    <kbd className="select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1 py-0.5 font-mono text-primary-foreground/70 text-xs">
+                    <kbd className="bg-primary-foreground/10 px-1 py-0.5 border border-primary-foreground/25 rounded font-mono text-primary-foreground/70 text-xs select-none">
                       ⌘
                     </kbd>
                     <span className="font-mono text-primary-foreground/40 text-xs">+</span>
-                    <kbd className="select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1 py-0.5 font-mono text-primary-foreground/70 text-xs">
+                    <kbd className="bg-primary-foreground/10 px-1 py-0.5 border border-primary-foreground/25 rounded font-mono text-primary-foreground/70 text-xs select-none">
                       ↵
                     </kbd>
                   </>
                 ) : (
                   <>
-                    <kbd className="select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1 py-0.5 font-mono text-primary-foreground/70 text-xs">
+                    <kbd className="bg-primary-foreground/10 px-1 py-0.5 border border-primary-foreground/25 rounded font-mono text-primary-foreground/70 text-xs select-none">
                       Ctrl
                     </kbd>
                     <span className="font-mono text-primary-foreground/40 text-xs">+</span>
-                    <kbd className="select-none rounded border border-primary-foreground/25 bg-primary-foreground/10 px-1 py-0.5 font-mono text-primary-foreground/70 text-xs">
+                    <kbd className="bg-primary-foreground/10 px-1 py-0.5 border border-primary-foreground/25 rounded font-mono text-primary-foreground/70 text-xs select-none">
                       ↵
                     </kbd>
                   </>
@@ -298,14 +298,14 @@ export function Home() {
 
             {input && (
               <>
-                <div className="mx-1 h-4 w-px bg-border/70" />
+                <div className="mx-1 bg-border/70 w-px h-4" />
                 <Tooltip label="yoink">
                   <Button
                     id="btn-copy"
                     size="icon"
                     variant="ghost"
                     onClick={handleCopy}
-                    className="h-8 w-8 rounded-full"
+                    className="rounded-full w-8 h-8"
                   >
                     <CopyIcon weight="bold" />
                   </Button>
@@ -316,7 +316,7 @@ export function Home() {
                     size="icon"
                     variant="ghost"
                     onClick={handleShare}
-                    className="h-8 w-8 rounded-full"
+                    className="rounded-full w-8 h-8"
                   >
                     <LinkIcon weight="bold" />
                   </Button>
@@ -335,25 +335,25 @@ export function Home() {
               </>
             )}
 
-            <div className="mx-1 hidden h-4 w-px bg-border/70 sm:block" />
-            <span id="kbd-find-hint" className="hidden items-center gap-0.5 px-2 sm:inline-flex">
+            <div className="hidden sm:block mx-1 bg-border/70 w-px h-4" />
+            <span id="kbd-find-hint" className="hidden sm:inline-flex items-center gap-0.5 px-2">
               {isMac() ? (
                 <>
-                  <kbd className="select-none rounded border border-border bg-muted px-1 py-0.5 font-mono text-muted-foreground text-xs">
+                  <kbd className="bg-muted px-1 py-0.5 border border-border rounded font-mono text-muted-foreground text-xs select-none">
                     ⌘
                   </kbd>
                   <span className="font-mono text-muted-foreground/40 text-xs">+</span>
-                  <kbd className="select-none rounded border border-border bg-muted px-1 py-0.5 font-mono text-muted-foreground text-xs">
+                  <kbd className="bg-muted px-1 py-0.5 border border-border rounded font-mono text-muted-foreground text-xs select-none">
                     F
                   </kbd>
                 </>
               ) : (
                 <>
-                  <kbd className="select-none rounded border border-border bg-muted px-1 py-0.5 font-mono text-muted-foreground text-xs">
+                  <kbd className="bg-muted px-1 py-0.5 border border-border rounded font-mono text-muted-foreground text-xs select-none">
                     Ctrl
                   </kbd>
                   <span className="font-mono text-muted-foreground/40 text-xs">+</span>
-                  <kbd className="select-none rounded border border-border bg-muted px-1 py-0.5 font-mono text-muted-foreground text-xs">
+                  <kbd className="bg-muted px-1 py-0.5 border border-border rounded font-mono text-muted-foreground text-xs select-none">
                     F
                   </kbd>
                 </>
