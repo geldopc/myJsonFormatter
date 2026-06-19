@@ -1,0 +1,58 @@
+# Changelog
+
+# 0.1.0 (2026-06-19)
+
+
+### Bug Fixes
+
+* AppLayout must be h-screen flex flex-col for full-screen editor layout ([e1e7e6a](https://github.com/geldopc/myJsonFormatter/commit/e1e7e6a82ef1e41cab704a9871f157f500702bdb))
+* clear error toast while typing in the editor ([1e47ef5](https://github.com/geldopc/myJsonFormatter/commit/1e47ef5e580eebecc7ff11c0381b868a83a56dd3))
+* Ctrl+F toggles panel, editor-area relative for correct panel anchor, lowerQuery.length step ([8fa4878](https://github.com/geldopc/myJsonFormatter/commit/8fa4878d9d59ea8309296ed7e09a4f7b2ded6bdd))
+* default to dark theme independently of other github.io apps ([1b02fa9](https://github.com/geldopc/myJsonFormatter/commit/1b02fa91aa63bb8adfd5e0a98881888dcaeef7c1))
+* editor follows dark/light theme (disable [@uiw](https://github.com/uiw) default light theme) ([788cac8](https://github.com/geldopc/myJsonFormatter/commit/788cac8485c09a24eae56125104ec0ec4ac0ed29))
+* extract onClose inline arrow function to named handleFindClose handler ([3f747e0](https://github.com/geldopc/myJsonFormatter/commit/3f747e0377da5db91e5fafd739a35195f6fd7bd3))
+* FindReplace layout — VSCode-style toggles in find row, responsive min-width ([1c94438](https://github.com/geldopc/myJsonFormatter/commit/1c944388984a337ecbd857e924ee9978a8938941))
+* FindReplace panel layout — move toggles to replace row, responsive width ([ce61ad5](https://github.com/geldopc/myJsonFormatter/commit/ce61ad58b32c26b28ab77097e655be09ffbd9961))
+* FindReplace quality fixes — advance on replace, named handlers, Tailwind min-w ([1a1a855](https://github.com/geldopc/myJsonFormatter/commit/1a1a85508244be3fee6769bab61dac7c1ec6e046))
+* highlight all search matches by opening the hidden CodeMirror search panel ([a73b5c8](https://github.com/geldopc/myJsonFormatter/commit/a73b5c8b378ddd2d239689863bcae062bbdaeb35))
+* improve text and placeholder contrast in JSON editor ([67ea2f9](https://github.com/geldopc/myJsonFormatter/commit/67ea2f92fd7949d764ed20d5b79911b721fc88ef))
+* keep focus in the search input while typing ([bd4af7d](https://github.com/geldopc/myJsonFormatter/commit/bd4af7d62120b4e28428372ea33658324c48ba5e))
+* opaque gutter background prevents text bleed-through on horizontal scroll ([6df2dbf](https://github.com/geldopc/myJsonFormatter/commit/6df2dbf413378133f3814cb939de330d72f3ca17))
+* replace BracketsIcon with BracketsCurlyIcon (correct phosphor icon) ([76777f4](https://github.com/geldopc/myJsonFormatter/commit/76777f4e5318e952c9cb621a4532a794c16d981a))
+* round ThemeToggle hover to match floating toolbar pill shape ([6b2d16d](https://github.com/geldopc/myJsonFormatter/commit/6b2d16d7fcf438a7271eb3dfe93efd772356910d))
+* sanitizeJson must skip string literals before stripping // comments (URLs were being corrupted) ([d3d0389](https://github.com/geldopc/myJsonFormatter/commit/d3d038965deddfe13e5a91f482e8a4a83fb287ba))
+* sanitizeJson must unescape over-escaped quotes ([7f2eedf](https://github.com/geldopc/myJsonFormatter/commit/7f2eedf20bbbcd0bbe007b44e14976e4ae0480c7))
+* unescape double-backslash sequences in log-format JSON ([9c5bca1](https://github.com/geldopc/myJsonFormatter/commit/9c5bca1553ec55f68eab3d0bb4e97c78e5fbeaf2))
+* widen textareaRef prop to RefObject<HTMLTextAreaElement | null> for React 19 ([6866e7f](https://github.com/geldopc/myJsonFormatter/commit/6866e7f2a3de0f625fa5a56e9969db34e7f4302e))
+
+
+### Features
+
+* add 'comic break' — smile button opens a random developerslife comic ([73acf22](https://github.com/geldopc/myJsonFormatter/commit/73acf22e813beebb12885b704ec253ab27e32ab6))
+* add CodeMirror theme mapping JSON tokens to existing color vars ([791c1d0](https://github.com/geldopc/myJsonFormatter/commit/791c1d0ad9eec4721fc990230d8f7e099afb641b))
+* add Ctrl+A and Ctrl+F shortcuts with find/replace panel ([b11d68b](https://github.com/geldopc/myJsonFormatter/commit/b11d68b5a9fdf7be9eda4999085db3a5e64f7c01))
+* add deepUnwrapJsonStrings helper for nested JSON-encoded strings ([359f63a](https://github.com/geldopc/myJsonFormatter/commit/359f63a7e4e185122efac79755c1cf9ec3b1caf1))
+* add FindReplace widget with find/replace and match navigation ([a824e88](https://github.com/geldopc/myJsonFormatter/commit/a824e884e2db95ea69fad442b8d7e177a2aeb7ff))
+* add FindReplace widget with find/replace and match navigation ([c81f7e1](https://github.com/geldopc/myJsonFormatter/commit/c81f7e1a972457cb05303a5ef6af06087ed92801))
+* add JSON syntax highlight CSS variables for light and dark modes ([f5f7e85](https://github.com/geldopc/myJsonFormatter/commit/f5f7e8501d89bfb9171d1a8bf5f1a87abfaca725))
+* add JSON syntax highlight tokenizer with key/value/number/boolean/null/punct tokens ([c9904b4](https://github.com/geldopc/myJsonFormatter/commit/c9904b434e7066321586d6eda81720706c6aa36e))
+* add JsonEditor module wrapping CodeMirror ([f4debde](https://github.com/geldopc/myJsonFormatter/commit/f4debde60f6f11636995e637a983b784d1b1dd46))
+* add shadcn Tooltip element, forward Button ref, mount TooltipProvider ([10e7676](https://github.com/geldopc/myJsonFormatter/commit/10e767674c329a84bbc3c6307d0d0f3a2f4f94b2))
+* add URL encoding/decoding with native gzip compression ([9bb3e99](https://github.com/geldopc/myJsonFormatter/commit/9bb3e991989b908f38760759a4353fb44c76b416))
+* BorderGlow adapts to light/dark theme ([c2eb860](https://github.com/geldopc/myJsonFormatter/commit/c2eb860d3c3f82f92fb313365a8021649fc0ae48))
+* drop editor top padding; subtle Lottie success ripple on format ([c9e671e](https://github.com/geldopc/myJsonFormatter/commit/c9e671e3d3baad6f76278e9910ce535d9bac17fc))
+* editor polish — placeholder, themed scrollbar, Sonner toasts, Prettify shortcut ([1918e20](https://github.com/geldopc/myJsonFormatter/commit/1918e200d3ff02b62957c2c56bbe3dbf3a6b06a5))
+* English-only copy with light humor; icon-only Copy/Share with toast feedback ([8bc7d5f](https://github.com/geldopc/myJsonFormatter/commit/8bc7d5facdd2cae5067afaa1af18995ec2fa8b3c))
+* full-screen JSON editor with toolbar, syntax highlight, drag-drop and URL sharing ([b7738cb](https://github.com/geldopc/myJsonFormatter/commit/b7738cb5d1ccb2786e0a958c9374940f67be7464))
+* highlight active line in the gutter only (VS Code renderLineHighlight: gutter) ([8a7ee56](https://github.com/geldopc/myJsonFormatter/commit/8a7ee565b1bed365702c953f9aa55d6019b0b5a3))
+* integrate BorderGlow on floating toolbar — glass glow on hover ([4b7bd8a](https://github.com/geldopc/myJsonFormatter/commit/4b7bd8ad779b6383b215c8acfab8d856a5b0b35f)), closes [#f0f0f0](https://github.com/geldopc/myJsonFormatter/issues/f0f0f0) [#d4d4d4](https://github.com/geldopc/myJsonFormatter/issues/d4d4d4) [#e8e8e8](https://github.com/geldopc/myJsonFormatter/issues/e8e8e8)
+* integrate CodeMirror editor into Home, remove legacy textarea/pre ([8d1198a](https://github.com/geldopc/myJsonFormatter/commit/8d1198a280f523989114f0033c3b9866c1b76f45))
+* replace favicon with brand mark, add OG/social metadata ([a224bea](https://github.com/geldopc/myJsonFormatter/commit/a224bea8c986b085a31d1a3c673c723375c484c8))
+* report unwrapped nested JSON strings in the sanitize toast ([ed38726](https://github.com/geldopc/myJsonFormatter/commit/ed387266cd46a4ff31f4b4792d1aecef87868638))
+* responsive toolbar/find, lazy overlays, modal focus a11y ([02e7435](https://github.com/geldopc/myJsonFormatter/commit/02e7435be1f140f8e0f534d6bab54b303db938c3))
+* rewrite FindReplace to drive CodeMirror search engine ([5986fa6](https://github.com/geldopc/myJsonFormatter/commit/5986fa6e4fd42835adbc7ca6f9a139b6183fe3a6))
+* rewrite json utils with SanitizeResult, prettifyJson and minifyJson ([41da773](https://github.com/geldopc/myJsonFormatter/commit/41da7735b76806d1194d8d92fab5b81a837ba313))
+* show OS-aware keyboard shortcut in floating toolbar ([2f8ccb0](https://github.com/geldopc/myJsonFormatter/commit/2f8ccb09174c301a2a453c70f44859baa04bd66e))
+* toolbar polish, info modal, repositioned find panel, CSS burst animation ([bcafd0e](https://github.com/geldopc/myJsonFormatter/commit/bcafd0e21a6dca856ec5b8697984b4cd21668aec))
+* unwrap nested JSON-encoded strings in prettify/minify output ([33bbf9a](https://github.com/geldopc/myJsonFormatter/commit/33bbf9ac606e0522fdfc04b37d0f3e5b0dac4a81))
+* update favicon to custom X-mark logo ([d50e8ff](https://github.com/geldopc/myJsonFormatter/commit/d50e8ff8672fd9c3dece9423845b28baf0c0ec5d))
