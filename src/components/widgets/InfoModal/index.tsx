@@ -21,6 +21,7 @@ export function InfoModal({ onClose }: InfoModalProps) {
   }, [onClose]);
 
   const mod = isMac() ? "⌘" : "Ctrl";
+  const foldMod = isMac() ? "⌥" : "⇧";
 
   return (
     <div
@@ -89,8 +90,8 @@ export function InfoModal({ onClose }: InfoModalProps) {
             <ShortcutRow keys={["↵"]} label="Next match (in find panel)" />
             <ShortcutRow keys={["⇧", "↵"]} label="Previous match" />
             <ShortcutRow keys={["Esc"]} label="Close find panel" />
-            <ShortcutRow keys={[mod, "⇧", "["]} label="Fold block" />
-            <ShortcutRow keys={[mod, "⇧", "]"]} label="Unfold block" />
+            <ShortcutRow keys={[mod, foldMod, "["]} label="Fold block" />
+            <ShortcutRow keys={[mod, foldMod, "]"]} label="Unfold block" />
           </div>
         </section>
       </div>
