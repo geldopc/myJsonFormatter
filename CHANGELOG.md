@@ -1,5 +1,12 @@
 # Changelog
 
+# [0.3.0](https://github.com/geldopc/myJsonFormatter/compare/v0.2.0...v0.3.0) (2026-06-19)
+
+
+### Features
+
+* scroll-to-top after format, vertical SideToolbar, theme animations ([71251d0](https://github.com/geldopc/myJsonFormatter/commit/71251d0d8132459dd9f4ed6b6a612922bf94efd4))
+
 # [0.2.0](https://github.com/geldopc/myJsonFormatter/compare/v0.1.0...v0.2.0) (2026-06-19)
 
 
