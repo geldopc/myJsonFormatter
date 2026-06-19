@@ -56,12 +56,17 @@ export function InfoModal({ onClose }: InfoModalProps) {
           <XIcon weight="bold" />
         </Button>
 
-        <h2
-          id="info-modal-title"
-          className="mb-4 font-heading text-sm font-semibold uppercase tracking-wide text-muted-foreground"
-        >
-          JSON Formatter
-        </h2>
+        <div className="mb-4 flex items-baseline justify-between">
+          <h2
+            id="info-modal-title"
+            className="font-heading text-sm font-semibold uppercase tracking-wide text-muted-foreground"
+          >
+            JSON Formatter
+          </h2>
+          <span className="font-mono text-xs text-muted-foreground/40">
+            v{__APP_VERSION__}
+          </span>
+        </div>
 
         <section id="info-features" className="mb-5">
           <ul className="space-y-2 font-mono text-xs text-foreground/70">

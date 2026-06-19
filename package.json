@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "lint": "biome lint ./src",
     "format": "biome format ./src --write",
-    "check": "biome check ./src --write"
+    "check": "biome check ./src --write",
+    "release": "release-it"
   },
   "dependencies": {
     "@codemirror/lang-json": "^6.0.2",
@@ -35,11 +36,13 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.0",
+    "@release-it/conventional-changelog": "^11.0.1",
     "@tailwindcss/vite": "^4.1.8",
     "@types/node": "^22.15.29",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
     "@vitejs/plugin-react": "^4.5.2",
+    "release-it": "^20.2.0",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.8.3",
     "vite": "^6.3.5"
