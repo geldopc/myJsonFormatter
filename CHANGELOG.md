@@ -1,5 +1,12 @@
 # Changelog
 
+# [0.5.0](https://github.com/geldopc/myJsonFormatter/compare/v0.4.1...v0.5.0) (2026-06-20)
+
+
+### Features
+
+* stagger border glow entrance — bottom first, side after with reverse sweep ([1e11ba8](https://github.com/geldopc/myJsonFormatter/commit/1e11ba891be79e3f13ed014989099622d576816b))
+
 ## [0.4.1](https://github.com/geldopc/myJsonFormatter/compare/v0.4.0...v0.4.1) (2026-06-20)
 
 # [0.4.0](https://github.com/geldopc/myJsonFormatter/compare/v0.3.0...v0.4.0) (2026-06-20)
