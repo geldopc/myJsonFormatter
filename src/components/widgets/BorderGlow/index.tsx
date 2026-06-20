@@ -13,6 +13,8 @@ interface BorderGlowProps {
   glowIntensity?: number;
   coneSpread?: number;
   animated?: boolean;
+  animatedDelay?: number;
+  sweepReverse?: boolean;
   colors?: string[];
   fillOpacity?: number;
   borderColor?: string;
@@ -123,6 +125,8 @@ export function BorderGlow({
   glowIntensity = 1.0,
   coneSpread = 25,
   animated = false,
+  animatedDelay = 0,
+  sweepReverse = false,
   colors = ["#c084fc", "#f472b6", "#38bdf8"],
   fillOpacity = 0.5,
   borderColor,
@@ -180,47 +184,56 @@ export function BorderGlow({
   React.useEffect(() => {
     if (!animated || !cardRef.current) return;
     const card = cardRef.current;
-    const angleStart = 110;
-    const angleEnd = 465;
-    card.classList.add("sweep-active");
-    card.style.setProperty("--cursor-angle", `${angleStart}deg`);
+    const angleStart = sweepReverse ? 465 : 110;
+    const angleEnd = sweepReverse ? 110 : 465;
 
-    animateValue({
-      duration: 500,
-      onUpdate: (v) => card.style.setProperty("--edge-proximity", String(v)),
-    });
-    animateValue({
-      ease: easeInCubic,
-      duration: 1500,
-      end: 50,
-      onUpdate: (v) =>
-        card.style.setProperty(
-          "--cursor-angle",
-          `${((angleEnd - angleStart) * (v / 100) + angleStart).toFixed(3)}deg`
-        ),
-    });
-    animateValue({
-      ease: easeOutCubic,
-      delay: 1500,
-      duration: 2250,
-      start: 50,
-      end: 100,
-      onUpdate: (v) =>
-        card.style.setProperty(
-          "--cursor-angle",
-          `${((angleEnd - angleStart) * (v / 100) + angleStart).toFixed(3)}deg`
-        ),
-    });
-    animateValue({
-      ease: easeInCubic,
-      delay: 2500,
-      duration: 1500,
-      start: 100,
-      end: 0,
-      onUpdate: (v) => card.style.setProperty("--edge-proximity", String(v)),
-      onEnd: () => card.classList.remove("sweep-active"),
-    });
-  }, [animated]);
+    const startSweep = () => {
+      card.classList.add("sweep-active");
+      card.style.setProperty("--cursor-angle", `${angleStart}deg`);
+
+      animateValue({
+        duration: 500,
+        onUpdate: (v) => card.style.setProperty("--edge-proximity", String(v)),
+      });
+      animateValue({
+        ease: easeInCubic,
+        duration: 1500,
+        end: 50,
+        onUpdate: (v) =>
+          card.style.setProperty(
+            "--cursor-angle",
+            `${((angleEnd - angleStart) * (v / 100) + angleStart).toFixed(3)}deg`
+          ),
+      });
+      animateValue({
+        ease: easeOutCubic,
+        delay: 1500,
+        duration: 2250,
+        start: 50,
+        end: 100,
+        onUpdate: (v) =>
+          card.style.setProperty(
+            "--cursor-angle",
+            `${((angleEnd - angleStart) * (v / 100) + angleStart).toFixed(3)}deg`
+          ),
+      });
+      animateValue({
+        ease: easeInCubic,
+        delay: 2500,
+        duration: 1500,
+        start: 100,
+        end: 0,
+        onUpdate: (v) => card.style.setProperty("--edge-proximity", String(v)),
+        onEnd: () => card.classList.remove("sweep-active"),
+      });
+    };
+
+    if (animatedDelay > 0) {
+      const t = window.setTimeout(startSweep, animatedDelay);
+      return () => window.clearTimeout(t);
+    }
+    startSweep();
+  }, [animated, animatedDelay, sweepReverse]);
 
   const glowVars = buildGlowVars(glowColor, glowIntensity);
 

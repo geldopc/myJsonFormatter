@@ -36,6 +36,8 @@ export function SideToolbar({ onInfoOpen, onComicOpen }: SideToolbarProps) {
         fillOpacity={0.08}
         className="backdrop-blur-xl"
         animated
+        animatedDelay={4000}
+        sweepReverse
       >
         <div id="side-toolbar" className="flex flex-col items-center gap-0.5 px-1.5 py-1.5">
           <ThemeToggle />
