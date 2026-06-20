@@ -1,5 +1,12 @@
 # Changelog
 
+# [0.4.0](https://github.com/geldopc/myJsonFormatter/compare/v0.3.0...v0.4.0) (2026-06-20)
+
+
+### Features
+
+* add GoatCounter analytics via centralized snippet ([61e08fa](https://github.com/geldopc/myJsonFormatter/commit/61e08faa170e6037b23f83428b9827b14d82d9f1))
+
 # [0.3.0](https://github.com/geldopc/myJsonFormatter/compare/v0.2.0...v0.3.0) (2026-06-19)
 
 
